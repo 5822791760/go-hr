@@ -17,6 +17,19 @@ func NewAuthorHandler(authorService usecases.IAuthorUsecase) AuthorHandler {
 	}
 }
 
+// CreateAuthor godoc
+//
+//	@Description	Create an Author
+//	@Tags			authors
+//	@Accept			json
+//	@Produce		json
+//
+//	@Param			request	body		usecases.CreateAuthorRequest	true	"Author update info"
+//
+//	@Success		200		{object}	repos.Author
+//	@Failure		500,401	{object}	errs.errBase
+//
+//	@Router			/authors [post]
 func (h AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
 	defer func() {
@@ -38,6 +51,16 @@ func (h AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, http.StatusCreated, author)
 }
 
+// QueryAuthors godoc
+//
+//	@Description	Find All Author
+//	@Tags			authors
+//	@Produce		json
+//
+//	@Success		200		{object}	[]repos.QueryAuthorGetAll
+//	@Failure		500,401	{object}	errs.errBase
+//
+//	@Router			/authors [get]
 func (h AuthorHandler) QueryAuthors(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
 	defer func() {
@@ -75,7 +98,21 @@ func (h AuthorHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, http.StatusOK, res)
 }
 
-func (h AuthorHandler) Update(w http.ResponseWriter, r *http.Request) {
+// UpdateAuthor godoc
+//
+//	@Description	Update an Author
+//	@Tags			authors
+//	@Accept			json
+//	@Produce		json
+//
+//	@Param			id		path		int								true	"Author ID"
+//	@Param			request	body		usecases.UpdateAuthorRequest	true	"Author update info"
+//
+//	@Success		200		{object}	repos.Author
+//	@Failure		500,401	{object}	errs.errBase
+//
+//	@Router			/authors/{id} [put]
+func (h AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
 	defer func() {
 		WriteError(w, err)
