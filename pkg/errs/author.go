@@ -15,7 +15,7 @@ func NewAuthorNotFoundErr(err error) Err {
 
 func NewAuthorValidateErr(errContexts []errBaseContext) Err {
 	return &errBase{
-		Code:         http.StatusNotFound,
+		Code:         http.StatusBadRequest,
 		ErrorMessage: "",
 		Context:      errContexts,
 	}
@@ -32,6 +32,6 @@ func NewAuthorInvalidNameLengthContext() errBaseContext {
 func NewAuthorNameAlreadyExistContext() errBaseContext {
 	return errBaseContext{
 		Key:     AuthorNameAlreadyExist,
-		Message: "Author name already exist length",
+		Message: "Author name already exist",
 	}
 }

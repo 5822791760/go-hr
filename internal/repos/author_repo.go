@@ -20,28 +20,11 @@ type IAuthorRepo interface {
 	FindOne(ctx context.Context, id int) (*Author, errs.Err)
 	Save(ctx context.Context, author *Author) errs.Err
 	QueryGetAll(ctx context.Context) ([]QueryAuthorGetAll, errs.Err)
-	NameExist(name string, id *int) (bool, errs.Err)
+	NameExist(ctx context.Context, name string, id int) (bool, errs.Err)
 }
 
 func NewAuthorRepo(db *sql.DB) authorRepo {
 	return authorRepo{db: db}
-}
-
-func (r authorRepo) NameExist(name string, id *int) (bool, errs.Err) {
-	cond := AND(table.Author.Name.EQ(String(name)))
-
-	if id != nil {
-		cond = cond.AND(table.Author.ID.NOT_EQ(Int(int64(*id))))
-	}
-
-	q := helpers.SelectExist().FROM(table.Author).WHERE(cond)
-
-	exist, err := helpers.IsExist(r.db, q)
-	if err != nil {
-		return false, err
-	}
-
-	return exist, nil
 }
 
 func (r authorRepo) FindAll(ctx context.Context) ([]*Author, errs.Err) {
@@ -72,6 +55,10 @@ func (r authorRepo) Save(ctx context.Context, author *Author) errs.Err {
 	var insertStmt InsertStatement
 	var updateStmt UpdateStatement
 
+	if err := author.Validate(ctx, r); err != nil {
+		return err
+	}
+
 	author.LatestUpdate()
 
 	if author.ID == 0 {
@@ -97,6 +84,23 @@ func (r authorRepo) Save(ctx context.Context, author *Author) errs.Err {
 	}
 
 	return nil
+}
+
+func (r authorRepo) NameExist(ctx context.Context, name string, id int) (bool, errs.Err) {
+	cond := AND(table.Author.Name.EQ(String(name)))
+
+	if id != 0 {
+		cond = cond.AND(table.Author.ID.NOT_EQ(Int(int64(id))))
+	}
+
+	q := helpers.SelectExist().FROM(table.Author).WHERE(cond)
+
+	exist, err := helpers.IsExist(r.db, q)
+	if err != nil {
+		return false, err
+	}
+
+	return exist, nil
 }
 
 // ========= QueryGetAll =========

@@ -7,6 +7,7 @@ import (
 
 	"github.com/5822791760/hr/internal/configs"
 	"github.com/5822791760/hr/internal/db/postgres"
+	"github.com/5822791760/hr/internal/routes"
 	"github.com/go-chi/chi/v5"
 
 	_ "github.com/5822791760/hr/docs"
@@ -47,7 +48,7 @@ func main() {
 		}),
 	))
 
-	err = configs.InitRoutes(r, db)
+	err = routes.InitRoutes(r, db)
 	if err != nil {
 		panic(err)
 	}

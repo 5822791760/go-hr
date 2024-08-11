@@ -1,11 +1,11 @@
-package configs
+package routes
 
 import (
 	"database/sql"
 	"fmt"
 	"net/http"
 
-	"github.com/5822791760/hr/internal/httphandlers"
+	"github.com/5822791760/hr/internal/handlers/https"
 	"github.com/5822791760/hr/internal/repos"
 	"github.com/5822791760/hr/internal/usecases"
 	"github.com/go-chi/chi/v5"
@@ -19,7 +19,7 @@ func InitRoutes(r *chi.Mux, db *sql.DB) error {
 	authorUsecase := usecases.NewAuthorUseCase(authorRepo)
 
 	// Handlers
-	authorHandler := httphandlers.NewAuthorHandler(authorUsecase)
+	authorHandler := https.NewAuthorHandler(authorUsecase)
 
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
