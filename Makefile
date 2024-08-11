@@ -6,7 +6,7 @@ endif
 DB_STRING="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable"
 
 .swag:
-	./internal/scripts/swag fmt -d ./internal/handlers
+	./internal/scripts/swag fmt -d ./internal/httphandlers
 	./internal/scripts/swag init -q -g cmd/app/main.go
 
 .wait-for-pg:

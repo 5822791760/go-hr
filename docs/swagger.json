@@ -61,7 +61,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/usecases.CreateAuthorRequest"
+                            "$ref": "#/definitions/usecases.CreateAuthorBody"
                         }
                     }
                 ],
@@ -113,7 +113,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/usecases.UpdateAuthorRequest"
+                            "$ref": "#/definitions/usecases.UpdateAuthorBody"
                         }
                     }
                 ],
@@ -200,7 +200,7 @@
                 }
             }
         },
-        "usecases.CreateAuthorRequest": {
+        "usecases.CreateAuthorBody": {
             "type": "object",
             "properties": {
                 "bio": {
@@ -211,7 +211,7 @@
                 }
             }
         },
-        "usecases.UpdateAuthorRequest": {
+        "usecases.UpdateAuthorBody": {
             "type": "object",
             "properties": {
                 "bio": {

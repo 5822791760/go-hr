@@ -67,7 +67,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/usecases.CreateAuthorRequest"
+                            "$ref": "#/definitions/usecases.CreateAuthorBody"
                         }
                     }
                 ],
@@ -119,7 +119,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/usecases.UpdateAuthorRequest"
+                            "$ref": "#/definitions/usecases.UpdateAuthorBody"
                         }
                     }
                 ],
@@ -206,7 +206,7 @@ const docTemplate = `{
                 }
             }
         },
-        "usecases.CreateAuthorRequest": {
+        "usecases.CreateAuthorBody": {
             "type": "object",
             "properties": {
                 "bio": {
@@ -217,7 +217,7 @@ const docTemplate = `{
                 }
             }
         },
-        "usecases.UpdateAuthorRequest": {
+        "usecases.UpdateAuthorBody": {
             "type": "object",
             "properties": {
                 "bio": {

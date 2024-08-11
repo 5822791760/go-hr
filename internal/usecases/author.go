@@ -12,10 +12,10 @@ type authorUsecase struct {
 }
 
 type IAuthorUsecase interface {
-	Create(ctx context.Context, body CreateAuthorRequest) (repos.Author, errs.Err)
+	Create(ctx context.Context, body CreateAuthorBody) (repos.Author, errs.Err)
 	QueryGetAll(ctx context.Context) ([]repos.QueryAuthorGetAll, errs.Err)
 	FindOne(ctx context.Context, id int) (repos.Author, errs.Err)
-	Update(ctx context.Context, id int, body UpdateAuthorRequest) (repos.Author, errs.Err)
+	Update(ctx context.Context, id int, body UpdateAuthorBody) (repos.Author, errs.Err)
 }
 
 func NewAuthorUseCase(authorRepo repos.IAuthorRepo) authorUsecase {
@@ -41,13 +41,13 @@ func (u authorUsecase) FindOne(ctx context.Context, id int) (repos.Author, errs.
 }
 
 // ===== Create =======
-type CreateAuthorRequest struct {
+type CreateAuthorBody struct {
 	Name string `json:"name"`
 	Bio  string `json:"bio"`
 }
 
-func (u authorUsecase) Create(ctx context.Context, body CreateAuthorRequest) (repos.Author, errs.Err) {
-	if err := u.Validate(ctx, ValidateAuthorRequest{Name: &body.Name}, nil); err != nil {
+func (u authorUsecase) Create(ctx context.Context, body CreateAuthorBody) (repos.Author, errs.Err) {
+	if err := u.Validate(ctx, ValidateAuthorBody{Name: &body.Name}, nil); err != nil {
 		return repos.Author{}, err
 	}
 
@@ -62,13 +62,13 @@ func (u authorUsecase) Create(ctx context.Context, body CreateAuthorRequest) (re
 // ===== Create =======
 
 // ===== Update =======
-type UpdateAuthorRequest struct {
+type UpdateAuthorBody struct {
 	Name string `json:"name"`
 	Bio  string `json:"bio"`
 }
 
-func (u authorUsecase) Update(ctx context.Context, id int, body UpdateAuthorRequest) (repos.Author, errs.Err) {
-	if err := u.Validate(ctx, ValidateAuthorRequest{Name: &body.Name}, &id); err != nil {
+func (u authorUsecase) Update(ctx context.Context, id int, body UpdateAuthorBody) (repos.Author, errs.Err) {
+	if err := u.Validate(ctx, ValidateAuthorBody{Name: &body.Name}, &id); err != nil {
 		return repos.Author{}, err
 	}
 
@@ -91,12 +91,12 @@ func (u authorUsecase) Update(ctx context.Context, id int, body UpdateAuthorRequ
 // ===== Update =======
 
 // ====== Validate =======
-type ValidateAuthorRequest struct {
+type ValidateAuthorBody struct {
 	ID   *int
 	Name *string
 }
 
-func (u authorUsecase) Validate(ctx context.Context, req ValidateAuthorRequest, id *int) errs.Err {
+func (u authorUsecase) Validate(ctx context.Context, req ValidateAuthorBody, id *int) errs.Err {
 	errContexts := errs.NewErrorContext()
 	name := req.Name
 

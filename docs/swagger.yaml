@@ -38,14 +38,14 @@ definitions:
       name:
         type: string
     type: object
-  usecases.CreateAuthorRequest:
+  usecases.CreateAuthorBody:
     properties:
       bio:
         type: string
       name:
         type: string
     type: object
-  usecases.UpdateAuthorRequest:
+  usecases.UpdateAuthorBody:
     properties:
       bio:
         type: string
@@ -92,7 +92,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/usecases.CreateAuthorRequest'
+          $ref: '#/definitions/usecases.CreateAuthorBody'
       produces:
       - application/json
       responses:
@@ -126,7 +126,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/usecases.UpdateAuthorRequest'
+          $ref: '#/definitions/usecases.UpdateAuthorBody'
       produces:
       - application/json
       responses:

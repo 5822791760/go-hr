@@ -1,4 +1,4 @@
-package handlers
+package httphandlers
 
 import (
 	"net/http"
@@ -24,7 +24,7 @@ func NewAuthorHandler(authorService usecases.IAuthorUsecase) AuthorHandler {
 //	@Accept			json
 //	@Produce		json
 //
-//	@Param			request	body		usecases.CreateAuthorRequest	true	"Author update info"
+//	@Param			request	body		usecases.CreateAuthorBody	true	"Author update info"
 //
 //	@Success		200		{object}	repos.Author
 //	@Failure		500,401	{object}	errs.errBase
@@ -38,7 +38,7 @@ func (h AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 
-	var body usecases.CreateAuthorRequest
+	var body usecases.CreateAuthorBody
 	if err := ParseBody(r, &body); err != nil {
 		return
 	}
@@ -105,8 +105,8 @@ func (h AuthorHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //
-//	@Param			id		path		int								true	"Author ID"
-//	@Param			request	body		usecases.UpdateAuthorRequest	true	"Author update info"
+//	@Param			id		path		int							true	"Author ID"
+//	@Param			request	body		usecases.UpdateAuthorBody	true	"Author update info"
 //
 //	@Success		200		{object}	repos.Author
 //	@Failure		500,401	{object}	errs.errBase
@@ -125,7 +125,7 @@ func (h AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var body usecases.UpdateAuthorRequest
+	var body usecases.UpdateAuthorBody
 	if err := ParseBody(r, &body); err != nil {
 		return
 	}
