@@ -25,6 +25,8 @@ func InitRoutes(r *chi.Mux, db *sql.DB) error {
 		r.Route("/v1", func(r chi.Router) {
 			r.Get("/authors", authorHandler.QueryAuthors)
 			r.Get("/authors/{id}", authorHandler.FindOne)
+			r.Post("/authors", authorHandler.CreateAuthor)
+			r.Put("/authors/{id}", authorHandler.Update)
 		})
 	})
 

@@ -1,10 +1,14 @@
 package errs
 
-type errbase struct {
+type errBaseContext struct {
+	Key     string
+	Message string
+}
+
+type errBase struct {
 	Code         uint
-	Key          string
-	Message      string
 	ErrorMessage string
+	Context      []errBaseContext
 }
 
 type Err interface {
@@ -12,19 +16,35 @@ type Err interface {
 	Error() string
 }
 
-func (e errbase) Error() string {
-	return e.Message
+func NewErrorContext() []errBaseContext {
+	return []errBaseContext{}
+}
+
+func (e *errBase) Error() string {
+	return e.ErrorMessage
+}
+
+func (e *errBase) AddContext(errContext errBaseContext) {
+	e.Context = append(e.Context, errContext)
 }
 
 // ====== HTTP =======
 
-func (e errbase) ToHttp() HttpErr {
-	return HttpErr{
+func (e *errBase) ToHttp() HttpErr {
+	err := HttpErr{
 		Code:         e.Code,
-		Key:          e.Key,
-		Message:      e.Message,
 		ErrorMessage: e.ErrorMessage,
+		Context:      []httpErrContext{},
 	}
+
+	for _, v := range e.Context {
+		err.Context = append(err.Context, httpErrContext{
+			Key:     v.Key,
+			Message: v.Message,
+		})
+	}
+
+	return err
 }
 
 // ====== HTTP =======

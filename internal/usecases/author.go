@@ -12,8 +12,10 @@ type authorUsecase struct {
 }
 
 type IAuthorUsecase interface {
+	Create(ctx context.Context, body CreateAuthorRequest) (repos.Author, errs.Err)
 	QueryGetAll(ctx context.Context) ([]repos.QueryAuthorGetAll, errs.Err)
 	FindOne(ctx context.Context, id int) (repos.Author, errs.Err)
+	Update(ctx context.Context, id int, body UpdateAuthorRequest) (repos.Author, errs.Err)
 }
 
 func NewAuthorUseCase(authorRepo repos.IAuthorRepo) authorUsecase {
@@ -30,10 +32,94 @@ func (u authorUsecase) QueryGetAll(ctx context.Context) ([]repos.QueryAuthorGetA
 }
 
 func (u authorUsecase) FindOne(ctx context.Context, id int) (repos.Author, errs.Err) {
-	author, err := u.authorRepo.FindOne(ctx, int64(id))
+	author, err := u.authorRepo.FindOne(ctx, id)
 	if err != nil {
 		return repos.Author{}, err
 	}
 
-	return author, nil
+	return *author, nil
 }
+
+// ===== Create =======
+type CreateAuthorRequest struct {
+	Name string `json:"name"`
+	Bio  string `json:"bio"`
+}
+
+func (u authorUsecase) Create(ctx context.Context, body CreateAuthorRequest) (repos.Author, errs.Err) {
+	if err := u.Validate(ctx, ValidateAuthorRequest{Name: &body.Name}, nil); err != nil {
+		return repos.Author{}, err
+	}
+
+	author := repos.NewAuthor(body.Name, body.Bio)
+	if err := u.authorRepo.Save(ctx, author); err != nil {
+		return repos.Author{}, err
+	}
+
+	return *author, nil
+}
+
+// ===== Create =======
+
+// ===== Update =======
+type UpdateAuthorRequest struct {
+	Name string `json:"name"`
+	Bio  string `json:"bio"`
+}
+
+func (u authorUsecase) Update(ctx context.Context, id int, body UpdateAuthorRequest) (repos.Author, errs.Err) {
+	if err := u.Validate(ctx, ValidateAuthorRequest{Name: &body.Name}, &id); err != nil {
+		return repos.Author{}, err
+	}
+
+	author, err := u.authorRepo.FindOne(ctx, id)
+	if err != nil {
+		return repos.Author{}, err
+	}
+
+	author.
+		ChangeName(body.Name).
+		ChangeBio(body.Bio)
+
+	if err := u.authorRepo.Save(ctx, author); err != nil {
+		return repos.Author{}, err
+	}
+
+	return *author, nil
+}
+
+// ===== Update =======
+
+// ====== Validate =======
+type ValidateAuthorRequest struct {
+	ID   *int
+	Name *string
+}
+
+func (u authorUsecase) Validate(ctx context.Context, req ValidateAuthorRequest, id *int) errs.Err {
+	errContexts := errs.NewErrorContext()
+	name := req.Name
+
+	if name != nil {
+		if len(*name) < 2 {
+			errContexts = append(errContexts, errs.NewAuthorInvalidNameLengthContext())
+		}
+
+		nameExist, err := u.authorRepo.NameExist(*name, id)
+		if err != nil {
+			return err
+		}
+
+		if nameExist {
+			errContexts = append(errContexts, errs.NewAuthorNameAlreadyExistContext())
+		}
+	}
+
+	if len(errContexts) > 0 {
+		return errs.NewAuthorValidateErr(errContexts)
+	}
+
+	return nil
+}
+
+// ====== Validate =======

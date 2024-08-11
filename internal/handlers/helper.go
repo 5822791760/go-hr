@@ -22,6 +22,10 @@ type httpError interface {
 }
 
 func WriteError(w http.ResponseWriter, err httpError) {
+	if err == nil {
+		return
+	}
+
 	data := err.ToHttp()
 
 	w.Header().Set("Content-Type", "application/json")
@@ -48,7 +52,7 @@ func GetParamInt(r *http.Request, key string) (int, errs.Err) {
 
 	data, xerr := strconv.Atoi(query)
 	if xerr != nil {
-		return 0, errs.NewInternalServerErr(err)
+		return 0, errs.NewInternalServerErr(xerr)
 	}
 
 	return data, nil
@@ -73,8 +77,19 @@ func GetQueryInt(r *http.Request, key string) (int, errs.Err) {
 
 	data, xerr := strconv.Atoi(query)
 	if xerr != nil {
-		return 0, errs.NewInternalServerErr(err)
+		return 0, errs.NewInternalServerErr(xerr)
 	}
 
 	return data, nil
+}
+
+func ParseBody(r *http.Request, dest interface{}) errs.Err {
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+
+	if err := decoder.Decode(dest); err != nil {
+		return errs.NewInternalServerErr(err)
+	}
+
+	return nil
 }

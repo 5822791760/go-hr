@@ -18,7 +18,20 @@ func NewAuthor(name string, bio string) *Author {
 }
 
 func (author *Author) ChangeName(name string) *Author {
+	if name == author.Name {
+		return author
+	}
+
 	author.Name = name
+	return author
+}
+
+func (author *Author) ChangeBio(bio string) *Author {
+	if bio == *author.Bio {
+		return author
+	}
+
+	author.Bio = &bio
 	return author
 }
 

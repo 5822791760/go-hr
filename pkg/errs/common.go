@@ -6,28 +6,34 @@ import (
 )
 
 func NewInternalServerErr(err error) Err {
-	return errbase{
+	return &errBase{
 		Code:         http.StatusInternalServerError,
-		Key:          InternalErrKey,
-		Message:      "",
 		ErrorMessage: err.Error(),
+		Context: []errBaseContext{{
+			Key:     InternalErrKey,
+			Message: "",
+		}},
 	}
 }
 
 func NewQueryNotExistErr(key string) Err {
-	return errbase{
+	return &errBase{
 		Code:         http.StatusInternalServerError,
-		Key:          InternalErrKey,
-		Message:      "",
 		ErrorMessage: fmt.Sprintf("Query %s does not exist", key),
+		Context: []errBaseContext{{
+			Key:     InternalErrKey,
+			Message: "",
+		}},
 	}
 }
 
 func NewParamNotExistErr(key string) Err {
-	return errbase{
+	return &errBase{
 		Code:         http.StatusInternalServerError,
-		Key:          InternalErrKey,
-		Message:      "",
 		ErrorMessage: fmt.Sprintf("Param %s does not exist", key),
+		Context: []errBaseContext{{
+			Key:     InternalErrKey,
+			Message: "",
+		}},
 	}
 }
