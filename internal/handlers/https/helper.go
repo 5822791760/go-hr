@@ -1,11 +1,13 @@
 package https
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/5822791760/hr/pkg/errs"
+	"github.com/5822791760/hr/pkg/helpers"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -89,6 +91,40 @@ func ParseBody(r *http.Request, dest interface{}) errs.Err {
 
 	if err := decoder.Decode(dest); err != nil {
 		return errs.NewInternalServerErr(err)
+	}
+
+	return nil
+}
+
+func GetContext(r *http.Request) context.Context {
+	ctx := r.Context()
+	return helpers.StoreContextDB(ctx)
+}
+
+func GetTxContext(r *http.Request) (context.Context, errs.Err) {
+	ctx := r.Context()
+
+	ctx, err := helpers.StartTransaction(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return ctx, nil
+}
+
+func End(ctx context.Context, err errs.Err) errs.Err {
+	if err != nil {
+		return err
+	}
+
+	tx, err := helpers.GetContextTx(ctx)
+	if err != nil {
+		return err
+	}
+
+	xerr := tx.Commit()
+	if xerr != nil {
+		return errs.NewInternalServerErr(xerr)
 	}
 
 	return nil

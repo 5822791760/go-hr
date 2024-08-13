@@ -29,11 +29,13 @@ func NewAuthorRepo(db *sql.DB) authorRepo {
 }
 
 func (r authorRepo) FindAll(ctx context.Context) ([]*Author, errs.Err) {
+	db := GetDB(ctx, r.db)
+
 	q := SELECT(table.Author.AllColumns).FROM(table.Author)
 
 	authors := []*Author{}
 
-	if err := q.QueryContext(ctx, r.db, authors); err != nil {
+	if err := q.QueryContext(ctx, db, authors); err != nil {
 		return []*Author{}, errs.NewInternalServerErr(err)
 	}
 
@@ -41,11 +43,13 @@ func (r authorRepo) FindAll(ctx context.Context) ([]*Author, errs.Err) {
 }
 
 func (r authorRepo) FindOne(ctx context.Context, id int) (*Author, errs.Err) {
+	db := GetDB(ctx, r.db)
+
 	q := SELECT(table.Author.AllColumns).FROM(table.Author).WHERE(table.Author.ID.EQ(Int(int64(id))))
 
 	var author Author
 
-	if err := q.QueryContext(ctx, r.db, &author); err != nil {
+	if err := q.QueryContext(ctx, db, &author); err != nil {
 		return &Author{}, errs.NewAuthorNotFoundErr(err)
 	}
 
@@ -55,6 +59,8 @@ func (r authorRepo) FindOne(ctx context.Context, id int) (*Author, errs.Err) {
 func (r authorRepo) Save(ctx context.Context, author *Author) errs.Err {
 	var insertStmt InsertStatement
 	var updateStmt UpdateStatement
+
+	db := GetDB(ctx, r.db)
 
 	if err := author.Validate(ctx, r); err != nil {
 		return err
@@ -73,13 +79,13 @@ func (r authorRepo) Save(ctx context.Context, author *Author) errs.Err {
 	}
 
 	if insertStmt != nil {
-		if err := insertStmt.QueryContext(ctx, r.db, author); err != nil {
+		if err := insertStmt.QueryContext(ctx, db, author); err != nil {
 			return errs.NewInternalServerErr(err)
 		}
 	}
 
 	if updateStmt != nil {
-		if err := updateStmt.QueryContext(ctx, r.db, author); err != nil {
+		if err := updateStmt.QueryContext(ctx, db, author); err != nil {
 			return errs.NewInternalServerErr(err)
 		}
 	}
@@ -88,9 +94,11 @@ func (r authorRepo) Save(ctx context.Context, author *Author) errs.Err {
 }
 
 func (r authorRepo) Delete(ctx context.Context, id int) errs.Err {
+	db := GetDB(ctx, r.db)
+
 	q := table.Author.DELETE().WHERE(table.Author.ID.EQ(Int(int64(id))))
 
-	res, err := q.ExecContext(ctx, r.db)
+	res, err := q.ExecContext(ctx, db)
 	if err != nil {
 		return errs.NewInternalServerErr(err)
 	}
@@ -108,6 +116,8 @@ func (r authorRepo) Delete(ctx context.Context, id int) errs.Err {
 }
 
 func (r authorRepo) NameExist(ctx context.Context, name string, id int) (bool, errs.Err) {
+	db := GetDB(ctx, r.db)
+
 	cond := AND(table.Author.Name.EQ(String(name)))
 
 	if id != 0 {
@@ -116,7 +126,7 @@ func (r authorRepo) NameExist(ctx context.Context, name string, id int) (bool, e
 
 	q := helpers.SelectExist().FROM(table.Author).WHERE(cond)
 
-	exist, err := helpers.IsExist(r.db, q)
+	exist, err := helpers.IsExist(db, q)
 	if err != nil {
 		return false, err
 	}
@@ -132,6 +142,8 @@ type QueryAuthorGetAll struct {
 }
 
 func (r authorRepo) QueryGetAll(ctx context.Context) ([]QueryAuthorGetAll, errs.Err) {
+	db := GetDB(ctx, r.db)
+
 	data := []QueryAuthorGetAll{}
 
 	q := SELECT(
@@ -139,7 +151,7 @@ func (r authorRepo) QueryGetAll(ctx context.Context) ([]QueryAuthorGetAll, errs.
 		SELECT(table.Author.Name).AS("QueryAuthorGetAll.Name"),
 	).FROM(table.Author)
 
-	if err := q.QueryContext(ctx, r.db, &data); err != nil {
+	if err := q.QueryContext(ctx, db, &data); err != nil {
 		return []QueryAuthorGetAll{}, errs.NewInternalServerErr(err)
 	}
 

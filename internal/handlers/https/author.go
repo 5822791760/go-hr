@@ -19,11 +19,11 @@ func NewAuthorHandler(authorService usecases.IAuthorUsecase) AuthorHandler {
 
 func (h AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
-	defer func() {
-		WriteError(w, err)
-	}()
+	ctx, err := GetTxContext(r)
 
-	ctx := r.Context()
+	defer func() {
+		WriteError(w, End(ctx, err))
+	}()
 
 	var body usecases.CreateAuthorBody
 	if err := ParseBody(r, &body); err != nil {
@@ -40,11 +40,11 @@ func (h AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 
 func (h AuthorHandler) QueryAuthors(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
+	ctx := GetContext(r)
+
 	defer func() {
 		WriteError(w, err)
 	}()
-
-	ctx := r.Context()
 
 	resp, err := h.authorUsecase.QueryGetAll(ctx)
 	if err != nil {
@@ -56,11 +56,11 @@ func (h AuthorHandler) QueryAuthors(w http.ResponseWriter, r *http.Request) {
 
 func (h AuthorHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
+	ctx := GetContext(r)
+
 	defer func() {
 		WriteError(w, err)
 	}()
-
-	ctx := r.Context()
 
 	id, err := GetParamInt(r, "id")
 	if err != nil {
@@ -77,11 +77,11 @@ func (h AuthorHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 
 func (h AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
-	defer func() {
-		WriteError(w, err)
-	}()
+	ctx, err := GetTxContext(r)
 
-	ctx := r.Context()
+	defer func() {
+		WriteError(w, End(ctx, err))
+	}()
 
 	id, err := GetParamInt(r, "id")
 	if err != nil {
@@ -103,11 +103,11 @@ func (h AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 
 func (h AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
-	defer func() {
-		WriteError(w, err)
-	}()
+	ctx, err := GetTxContext(r)
 
-	ctx := r.Context()
+	defer func() {
+		WriteError(w, End(ctx, err))
+	}()
 
 	id, err := GetParamInt(r, "id")
 	if err != nil {
