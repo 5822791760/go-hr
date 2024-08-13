@@ -29,7 +29,7 @@ func NewInternalServerErrByString(message string) Err {
 
 func NewNoRowAffectedErr() Err {
 	return &errBase{
-		Code:         http.StatusInternalServerError,
+		Code:         http.StatusBadRequest,
 		ErrorMessage: "No row affected",
 		Context: []errBaseContext{{
 			Key:     InternalErrKey,

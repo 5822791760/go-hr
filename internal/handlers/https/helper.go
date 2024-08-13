@@ -89,8 +89,8 @@ func ParseBody(r *http.Request, dest interface{}) errs.Err {
 	decoder := json.NewDecoder(r.Body)
 	defer r.Body.Close()
 
-	if err := decoder.Decode(dest); err != nil {
-		return errs.NewInternalServerErr(err)
+	if xerr := decoder.Decode(dest); xerr != nil {
+		return errs.NewInternalServerErr(xerr)
 	}
 
 	return nil

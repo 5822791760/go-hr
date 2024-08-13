@@ -15,8 +15,8 @@ func IsExist(db qrm.DB, statement SelectStatement) (bool, errs.Err) {
 		Exists bool
 	}
 	stmt := SELECT(EXISTS(statement).AS("Exists"))
-	if err := stmt.Query(db, &data); err != nil {
-		return false, errs.NewInternalServerErr(err)
+	if xerr := stmt.Query(db, &data); xerr != nil {
+		return false, errs.NewInternalServerErr(xerr)
 	}
 
 	return data.Exists, nil

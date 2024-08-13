@@ -30,7 +30,7 @@ func main() {
 
 	r := chi.NewRouter()
 
-	err = routes.InitRoutes(r, db)
+	err = routes.InitRoutes(r)
 	if err != nil {
 		panic(err)
 	}

@@ -2,7 +2,7 @@ package repos
 
 import (
 	"context"
-	"database/sql"
+	"errors"
 
 	"github.com/5822791760/hr/internal/db/postgres/public/table"
 	"github.com/5822791760/hr/pkg/errs"
@@ -11,9 +11,7 @@ import (
 	. "github.com/go-jet/jet/v2/postgres"
 )
 
-type authorRepo struct {
-	db *sql.DB
-}
+type authorRepo struct{}
 
 type IAuthorRepo interface {
 	FindAll(ctx context.Context) ([]*Author, errs.Err)
@@ -24,33 +22,39 @@ type IAuthorRepo interface {
 	Delete(ctx context.Context, id int) errs.Err
 }
 
-func NewAuthorRepo(db *sql.DB) authorRepo {
-	return authorRepo{db: db}
+func NewAuthorRepo() authorRepo {
+	return authorRepo{}
 }
 
 func (r authorRepo) FindAll(ctx context.Context) ([]*Author, errs.Err) {
-	db := GetDB(ctx, r.db)
+	db, err := GetDB(ctx)
+	if err != nil {
+		return []*Author{}, err
+	}
 
 	q := SELECT(table.Author.AllColumns).FROM(table.Author)
 
 	authors := []*Author{}
 
-	if err := q.QueryContext(ctx, db, authors); err != nil {
-		return []*Author{}, errs.NewInternalServerErr(err)
+	if xerr := q.QueryContext(ctx, db, authors); xerr != nil {
+		return []*Author{}, errs.NewInternalServerErr(xerr)
 	}
 
 	return authors, nil
 }
 
 func (r authorRepo) FindOne(ctx context.Context, id int) (*Author, errs.Err) {
-	db := GetDB(ctx, r.db)
+	db, err := GetDB(ctx)
+	if err != nil {
+		return &Author{}, err
+	}
 
 	q := SELECT(table.Author.AllColumns).FROM(table.Author).WHERE(table.Author.ID.EQ(Int(int64(id))))
 
 	var author Author
 
-	if err := q.QueryContext(ctx, db, &author); err != nil {
-		return &Author{}, errs.NewAuthorNotFoundErr(err)
+	if xerr := q.QueryContext(ctx, db, &author); xerr != nil {
+		return &Author{}, errs.NewAuthorNotFoundErr(xerr)
 	}
 
 	return &author, nil
@@ -60,7 +64,10 @@ func (r authorRepo) Save(ctx context.Context, author *Author) errs.Err {
 	var insertStmt InsertStatement
 	var updateStmt UpdateStatement
 
-	db := GetDB(ctx, r.db)
+	db, err := GetDB(ctx)
+	if err != nil {
+		return err
+	}
 
 	if err := author.Validate(ctx, r); err != nil {
 		return err
@@ -79,14 +86,14 @@ func (r authorRepo) Save(ctx context.Context, author *Author) errs.Err {
 	}
 
 	if insertStmt != nil {
-		if err := insertStmt.QueryContext(ctx, db, author); err != nil {
-			return errs.NewInternalServerErr(err)
+		if xerr := insertStmt.QueryContext(ctx, db, author); xerr != nil {
+			return errs.NewInternalServerErr(xerr)
 		}
 	}
 
 	if updateStmt != nil {
-		if err := updateStmt.QueryContext(ctx, db, author); err != nil {
-			return errs.NewInternalServerErr(err)
+		if xerr := updateStmt.QueryContext(ctx, db, author); xerr != nil {
+			return errs.NewInternalServerErr(xerr)
 		}
 	}
 
@@ -94,29 +101,35 @@ func (r authorRepo) Save(ctx context.Context, author *Author) errs.Err {
 }
 
 func (r authorRepo) Delete(ctx context.Context, id int) errs.Err {
-	db := GetDB(ctx, r.db)
+	db, err := GetDB(ctx)
+	if err != nil {
+		return err
+	}
 
 	q := table.Author.DELETE().WHERE(table.Author.ID.EQ(Int(int64(id))))
 
-	res, err := q.ExecContext(ctx, db)
-	if err != nil {
-		return errs.NewInternalServerErr(err)
+	res, xerr := q.ExecContext(ctx, db)
+	if xerr != nil {
+		return errs.NewInternalServerErr(xerr)
 	}
 
-	effected, err := res.RowsAffected()
-	if err != nil {
-		return errs.NewInternalServerErr(err)
+	effected, xerr := res.RowsAffected()
+	if xerr != nil {
+		return errs.NewInternalServerErr(xerr)
 	}
 
 	if effected < 1 {
-		return errs.NewNoRowAffectedErr()
+		return errs.NewAuthorNotFoundErr(errors.New("no row affected"))
 	}
 
 	return nil
 }
 
 func (r authorRepo) NameExist(ctx context.Context, name string, id int) (bool, errs.Err) {
-	db := GetDB(ctx, r.db)
+	db, err := GetDB(ctx)
+	if err != nil {
+		return false, err
+	}
 
 	cond := AND(table.Author.Name.EQ(String(name)))
 
@@ -142,7 +155,10 @@ type QueryAuthorGetAll struct {
 }
 
 func (r authorRepo) QueryGetAll(ctx context.Context) ([]QueryAuthorGetAll, errs.Err) {
-	db := GetDB(ctx, r.db)
+	db, err := GetDB(ctx)
+	if err != nil {
+		return []QueryAuthorGetAll{}, err
+	}
 
 	data := []QueryAuthorGetAll{}
 
@@ -151,8 +167,8 @@ func (r authorRepo) QueryGetAll(ctx context.Context) ([]QueryAuthorGetAll, errs.
 		SELECT(table.Author.Name).AS("QueryAuthorGetAll.Name"),
 	).FROM(table.Author)
 
-	if err := q.QueryContext(ctx, db, &data); err != nil {
-		return []QueryAuthorGetAll{}, errs.NewInternalServerErr(err)
+	if xerr := q.QueryContext(ctx, db, &data); xerr != nil {
+		return []QueryAuthorGetAll{}, errs.NewInternalServerErr(xerr)
 	}
 
 	return data, nil

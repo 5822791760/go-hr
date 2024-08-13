@@ -43,11 +43,11 @@ func GetContextTx(ctx context.Context) (*sql.Tx, errs.Err) {
 	return db, nil
 }
 
-func GetContextDB(ctx context.Context) qrm.DB {
+func GetContextDB(ctx context.Context) (qrm.DB, errs.Err) {
 	db, ok := ctx.Value(DBKey).(qrm.DB)
 	if !ok {
-		return nil
+		return nil, errs.NewInternalServerErrByString("No DB context stored")
 	}
 
-	return db
+	return db, nil
 }

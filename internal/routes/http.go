@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -11,9 +10,9 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func InitRoutes(r *chi.Mux, db *sql.DB) error {
+func InitRoutes(r *chi.Mux) error {
 	// Repos
-	authorRepo := repos.NewAuthorRepo(db)
+	authorRepo := repos.NewAuthorRepo()
 
 	// Use Case
 	authorUsecase := usecases.NewAuthorUseCase(authorRepo)
