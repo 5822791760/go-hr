@@ -16,6 +16,7 @@ type IAuthorUsecase interface {
 	QueryGetAll(ctx context.Context) ([]repos.QueryAuthorGetAll, errs.Err)
 	FindOne(ctx context.Context, id int) (repos.Author, errs.Err)
 	Update(ctx context.Context, id int, body UpdateAuthorBody) (repos.Author, errs.Err)
+	Delete(ctx context.Context, id int) (DeleteAuthorResponse, errs.Err)
 }
 
 func NewAuthorUseCase(authorRepo repos.IAuthorRepo) authorUsecase {
@@ -58,6 +59,7 @@ func (u authorUsecase) Create(ctx context.Context, body CreateAuthorBody) (repos
 // ===== Create =======
 
 // ===== Update =======
+
 type UpdateAuthorBody struct {
 	Name string `json:"name"`
 	Bio  string `json:"bio"`
@@ -81,3 +83,22 @@ func (u authorUsecase) Update(ctx context.Context, id int, body UpdateAuthorBody
 }
 
 // ===== Update =======
+
+// ===== Delete =======
+
+type DeleteAuthorResponse struct {
+	Success bool `json:"success"`
+}
+
+func (u authorUsecase) Delete(ctx context.Context, id int) (DeleteAuthorResponse, errs.Err) {
+	err := u.authorRepo.Delete(ctx, id)
+	if err != nil {
+		return DeleteAuthorResponse{}, err
+	}
+
+	return DeleteAuthorResponse{
+		Success: true,
+	}, nil
+}
+
+// ===== Delete =======

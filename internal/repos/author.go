@@ -10,6 +10,13 @@ import (
 
 type Author model.Author
 
+type IAuthor interface {
+	ChangeName(name string) *Author
+	ChangeBio(bio string) *Author
+	LatestUpdate() *Author
+	Validate(ctx context.Context, repo authorRepo) errs.Err
+}
+
 func NewAuthor(name string, bio string) *Author {
 	return &Author{
 		Name:      name,

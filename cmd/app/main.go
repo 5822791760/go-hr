@@ -9,22 +9,8 @@ import (
 	"github.com/5822791760/hr/internal/db/postgres"
 	"github.com/5822791760/hr/internal/routes"
 	"github.com/go-chi/chi/v5"
-
-	_ "github.com/5822791760/hr/docs"
-	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
-//	@title			Swagger Example API
-//	@version		1.0
-//	@description	This is a sample server Petstore server.
-//	@termsOfService	http://swagger.io/terms/
-
-//	@host		localhost:3000
-//	@BasePath	/api/v1
-
-// @securityDefinitions.apikey	Bearer
-// @in							header
-// @name						Authorization
 func main() {
 	err := configs.LoadConfig()
 	if err != nil {
@@ -40,13 +26,6 @@ func main() {
 	defer db.Close()
 
 	r := chi.NewRouter()
-
-	r.Get("/api/documentation/*", httpSwagger.Handler(
-		httpSwagger.URL("/api/documentation/doc.json"),
-		httpSwagger.UIConfig(map[string]string{
-			"persistAuthorization": "true",
-		}),
-	))
 
 	err = routes.InitRoutes(r, db)
 	if err != nil {

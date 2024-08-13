@@ -1,0 +1,18 @@
+meta {
+  name: DELETE authors :id
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{url}}/authors/{{id}}
+  body: none
+  auth: none
+}
+
+body:json {
+  {
+    "name": "rober",
+    "bio": "test123"
+  }
+}

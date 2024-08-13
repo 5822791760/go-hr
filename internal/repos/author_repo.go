@@ -21,6 +21,7 @@ type IAuthorRepo interface {
 	Save(ctx context.Context, author *Author) errs.Err
 	QueryGetAll(ctx context.Context) ([]QueryAuthorGetAll, errs.Err)
 	NameExist(ctx context.Context, name string, id int) (bool, errs.Err)
+	Delete(ctx context.Context, id int) errs.Err
 }
 
 func NewAuthorRepo(db *sql.DB) authorRepo {
@@ -81,6 +82,26 @@ func (r authorRepo) Save(ctx context.Context, author *Author) errs.Err {
 		if err := updateStmt.QueryContext(ctx, r.db, author); err != nil {
 			return errs.NewInternalServerErr(err)
 		}
+	}
+
+	return nil
+}
+
+func (r authorRepo) Delete(ctx context.Context, id int) errs.Err {
+	q := table.Author.DELETE().WHERE(table.Author.ID.EQ(Int(int64(id))))
+
+	res, err := q.ExecContext(ctx, r.db)
+	if err != nil {
+		return errs.NewInternalServerErr(err)
+	}
+
+	effected, err := res.RowsAffected()
+	if err != nil {
+		return errs.NewInternalServerErr(err)
+	}
+
+	if effected < 1 {
+		return errs.NewNoRowAffectedErr()
 	}
 
 	return nil

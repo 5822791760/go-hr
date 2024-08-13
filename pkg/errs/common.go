@@ -16,6 +16,28 @@ func NewInternalServerErr(err error) Err {
 	}
 }
 
+func NewInternalServerErrByString(message string) Err {
+	return &errBase{
+		Code:         http.StatusInternalServerError,
+		ErrorMessage: message,
+		Context: []errBaseContext{{
+			Key:     InternalErrKey,
+			Message: "",
+		}},
+	}
+}
+
+func NewNoRowAffectedErr() Err {
+	return &errBase{
+		Code:         http.StatusInternalServerError,
+		ErrorMessage: "No row affected",
+		Context: []errBaseContext{{
+			Key:     InternalErrKey,
+			Message: "",
+		}},
+	}
+}
+
 func NewQueryNotExistErr(key string) Err {
 	return &errBase{
 		Code:         http.StatusInternalServerError,

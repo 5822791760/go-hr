@@ -17,19 +17,6 @@ func NewAuthorHandler(authorService usecases.IAuthorUsecase) AuthorHandler {
 	}
 }
 
-// CreateAuthor godoc
-//
-//	@Description	Create an Author
-//	@Tags			authors
-//	@Accept			json
-//	@Produce		json
-//
-//	@Param			request	body		usecases.CreateAuthorBody	true	"Author update info"
-//
-//	@Success		200		{object}	repos.Author
-//	@Failure		500,401	{object}	errs.errBase
-//
-//	@Router			/authors [post]
 func (h AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
 	defer func() {
@@ -51,16 +38,6 @@ func (h AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, http.StatusCreated, author)
 }
 
-// QueryAuthors godoc
-//
-//	@Description	Find All Author
-//	@Tags			authors
-//	@Produce		json
-//
-//	@Success		200		{object}	[]repos.QueryAuthorGetAll
-//	@Failure		500,401	{object}	errs.errBase
-//
-//	@Router			/authors [get]
 func (h AuthorHandler) QueryAuthors(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
 	defer func() {
@@ -98,20 +75,6 @@ func (h AuthorHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, http.StatusOK, res)
 }
 
-// UpdateAuthor godoc
-//
-//	@Description	Update an Author
-//	@Tags			authors
-//	@Accept			json
-//	@Produce		json
-//
-//	@Param			id		path		int							true	"Author ID"
-//	@Param			request	body		usecases.UpdateAuthorBody	true	"Author update info"
-//
-//	@Success		200		{object}	repos.Author
-//	@Failure		500,401	{object}	errs.errBase
-//
-//	@Router			/authors/{id} [put]
 func (h AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
 	defer func() {
@@ -131,6 +94,27 @@ func (h AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res, err := h.authorUsecase.Update(ctx, id, body)
+	if err != nil {
+		return
+	}
+
+	WriteJSON(w, http.StatusOK, res)
+}
+
+func (h AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request) {
+	var err errs.Err
+	defer func() {
+		WriteError(w, err)
+	}()
+
+	ctx := r.Context()
+
+	id, err := GetParamInt(r, "id")
+	if err != nil {
+		return
+	}
+
+	res, err := h.authorUsecase.Delete(ctx, id)
 	if err != nil {
 		return
 	}

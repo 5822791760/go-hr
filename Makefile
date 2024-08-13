@@ -5,10 +5,6 @@ endif
 
 DB_STRING="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable"
 
-.swag:
-	./internal/scripts/swag fmt -d ./internal/httphandlers
-	./internal/scripts/swag init -q -g cmd/app/main.go
-
 .wait-for-pg:
 	./internal/scripts/wait-for-postgres.sh
 
@@ -18,7 +14,7 @@ up:
 down:
 	docker-compose down --remove-orphans
 
-dev: up .wait-for-pg .swag
+dev: up .wait-for-pg
 	./internal/scripts/air -c .air.toml
 
 build:
