@@ -89,6 +89,17 @@ func (r authorRepo) Save(ctx context.Context, author *Author) errs.Err {
 		if xerr := insertStmt.QueryContext(ctx, db, author); xerr != nil {
 			return errs.NewInternalServerErr(xerr)
 		}
+		// query, args := insertStmt.Sql()
+		// rows, xerr := db.QueryContext(ctx, query, args...)
+		// if xerr != nil {
+		// 	return errs.NewInternalServerErr(xerr)
+		// }
+
+		// for rows.Next() {
+		// 	if xerr := rows.Scan(&author.ID); xerr != nil {
+		// 		return errs.NewInternalServerErr(xerr)
+		// 	}
+		// }
 	}
 
 	if updateStmt != nil {

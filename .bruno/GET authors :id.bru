@@ -5,9 +5,13 @@ meta {
 }
 
 get {
-  url: {{url}}/authors/{{id}}
+  url: {{url}}/authors/:id
   body: none
   auth: none
+}
+
+params:path {
+  id: 1
 }
 
 body:json {
