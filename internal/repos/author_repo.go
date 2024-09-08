@@ -61,8 +61,7 @@ func (r authorRepo) FindOne(ctx context.Context, id int) (*Author, errs.Err) {
 }
 
 func (r authorRepo) Save(ctx context.Context, author *Author) errs.Err {
-	var insertStmt InsertStatement
-	var updateStmt UpdateStatement
+	var s Statement
 
 	db, err := GetDB(ctx)
 	if err != nil {
@@ -76,34 +75,17 @@ func (r authorRepo) Save(ctx context.Context, author *Author) errs.Err {
 	author.LatestUpdate()
 
 	if author.ID == 0 {
-		insertStmt = table.Author.
+		s = table.Author.
 			INSERT(table.Author.Name, table.Author.Bio).
 			VALUES(author.Name, *author.Bio).
 			RETURNING(table.Author.AllColumns)
 
 	} else {
-		updateStmt = table.Author.UPDATE(table.Author.AllColumns).MODEL(author).WHERE(table.Author.ID.EQ(Int(int64(author.ID)))).RETURNING(table.Author.AllColumns)
+		s = table.Author.UPDATE(table.Author.AllColumns).MODEL(author).WHERE(table.Author.ID.EQ(Int(int64(author.ID)))).RETURNING(table.Author.AllColumns)
 	}
 
-	if insertStmt != nil {
-		if xerr := insertStmt.QueryContext(ctx, db, author); xerr != nil {
-			return errs.NewInternalServerErr(xerr)
-		}
-		// query, args := insertStmt.Sql()
-		// rows, xerr := db.QueryContext(ctx, query, args...)
-		// if xerr != nil {
-		// 	return errs.NewInternalServerErr(xerr)
-		// }
-
-		// for rows.Next() {
-		// 	if xerr := rows.Scan(&author.ID); xerr != nil {
-		// 		return errs.NewInternalServerErr(xerr)
-		// 	}
-		// }
-	}
-
-	if updateStmt != nil {
-		if xerr := updateStmt.QueryContext(ctx, db, author); xerr != nil {
+	if s != nil {
+		if xerr := s.QueryContext(ctx, db, author); xerr != nil {
 			return errs.NewInternalServerErr(xerr)
 		}
 	}

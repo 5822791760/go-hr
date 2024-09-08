@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE authors (
+CREATE TABLE author (
   id   SERIAL PRIMARY KEY,
   name text      NOT NULL,
   bio  text,
@@ -11,5 +11,5 @@ CREATE TABLE authors (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE authors;
+DROP TABLE author;
 -- +goose StatementEnd

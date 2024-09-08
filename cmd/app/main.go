@@ -3,7 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/5822791760/hr/internal/configs"
 	"github.com/5822791760/hr/internal/db/postgres"
@@ -35,11 +39,39 @@ func main() {
 		panic(err)
 	}
 
-	const Port = 3000
+	ListenAndServe(r, 3000)
+}
+
+func ListenAndServe(r *chi.Mux, port int) {
+	con := make(chan struct{})
+	srv := &http.Server{
+		Addr:    fmt.Sprintf("0.0.0.0:%d", port),
+		Handler: r,
+	}
+
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt, syscall.SIGTERM)
+		<-sigint
+
+		if err := srv.Shutdown(context.Background()); err != nil {
+			log.Fatalf("HTTP server Shutdown: %v", err)
+		}
+
+		fmt.Printf("\n\n")
+		fmt.Printf("Gracefully Shutting down Server....")
+		fmt.Printf("\n\n")
+
+		close(con)
+	}()
 
 	fmt.Printf("\n======================================\n\n")
-	fmt.Printf("Listening to port %d", Port)
+	fmt.Printf("Listening to port %d", port)
 	fmt.Printf("\n\n======================================\n\n")
+	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		// Error starting or closing listener:
+		fmt.Printf("HTTP server Shutdown: %v", err)
+	}
 
-	http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", Port), r)
+	<-con
 }
