@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func InitRoutes(r *chi.Mux) error {
+func InitRoutes(r *chi.Mux, db *sql.DB) error {
 	// Repos
 	authorRepo := repos.NewAuthorRepo()
 
@@ -18,7 +19,7 @@ func InitRoutes(r *chi.Mux) error {
 	authorUsecase := usecases.NewAuthorUseCase(authorRepo)
 
 	// Handlers
-	authorHandler := https.NewAuthorHandler(authorUsecase)
+	authorHandler := https.NewAuthorHandler(db, authorUsecase)
 
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {

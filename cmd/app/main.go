@@ -12,7 +12,6 @@ import (
 	"github.com/5822791760/hr/internal/configs"
 	"github.com/5822791760/hr/internal/db/postgres"
 	"github.com/5822791760/hr/internal/routes"
-	"github.com/5822791760/hr/pkg/helpers"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -30,11 +29,9 @@ func main() {
 	}
 	defer db.Close()
 
-	helpers.InitCoreDB(db)
-
 	r := chi.NewRouter()
 
-	err = routes.InitRoutes(r)
+	err = routes.InitRoutes(r, db)
 	if err != nil {
 		panic(err)
 	}

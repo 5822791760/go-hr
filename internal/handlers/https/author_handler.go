@@ -5,24 +5,27 @@ import (
 
 	"github.com/5822791760/hr/internal/usecases"
 	"github.com/5822791760/hr/pkg/errs"
+	"github.com/5822791760/hr/pkg/helpers"
 )
 
 type AuthorHandler struct {
+	db            helpers.Transactionable
 	authorUsecase usecases.IAuthorUsecase
 }
 
-func NewAuthorHandler(authorService usecases.IAuthorUsecase) AuthorHandler {
+func NewAuthorHandler(db helpers.Transactionable, authorUsecase usecases.IAuthorUsecase) AuthorHandler {
 	return AuthorHandler{
-		authorUsecase: authorService,
+		db:            db,
+		authorUsecase: authorUsecase,
 	}
 }
 
 func (h AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
-	ctx, err := GetTxContext(r)
+	ctx, end, err := GetTxContext(r, h.db)
 
 	defer func() {
-		WriteError(w, End(ctx, err))
+		WriteError(w, end(err))
 	}()
 
 	var body usecases.CreateAuthorBody
@@ -40,7 +43,7 @@ func (h AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 
 func (h AuthorHandler) QueryAuthors(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
-	ctx := GetContext(r)
+	ctx := GetContext(r, h.db)
 
 	defer func() {
 		WriteError(w, err)
@@ -56,7 +59,7 @@ func (h AuthorHandler) QueryAuthors(w http.ResponseWriter, r *http.Request) {
 
 func (h AuthorHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
-	ctx := GetContext(r)
+	ctx := GetContext(r, h.db)
 
 	defer func() {
 		WriteError(w, err)
@@ -77,10 +80,10 @@ func (h AuthorHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 
 func (h AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
-	ctx, err := GetTxContext(r)
+	ctx, end, err := GetTxContext(r, h.db)
 
 	defer func() {
-		WriteError(w, End(ctx, err))
+		WriteError(w, end(err))
 	}()
 
 	id, err := GetParamInt(r, "id")
@@ -103,10 +106,10 @@ func (h AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 
 func (h AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 	var err errs.Err
-	ctx, err := GetTxContext(r)
+	ctx, end, err := GetTxContext(r, h.db)
 
 	defer func() {
-		WriteError(w, End(ctx, err))
+		WriteError(w, end(err))
 	}()
 
 	id, err := GetParamInt(r, "id")

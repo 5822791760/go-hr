@@ -96,36 +96,36 @@ func ParseBody(r *http.Request, dest interface{}) errs.Err {
 	return nil
 }
 
-func GetContext(r *http.Request) context.Context {
+func GetContext(r *http.Request, db interface{}) context.Context {
 	ctx := r.Context()
-	return helpers.StoreContextDB(ctx)
+	return helpers.StoreContextDB(ctx, db)
 }
 
-func GetTxContext(r *http.Request) (context.Context, errs.Err) {
+func GetTxContext(r *http.Request, tx helpers.Transactionable) (context.Context, func(err errs.Err) errs.Err, errs.Err) {
 	ctx := r.Context()
 
-	ctx, err := helpers.StartTransaction(ctx)
+	ctx, err := helpers.StartTransaction(ctx, tx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return ctx, nil
-}
+	end := func(err errs.Err) errs.Err {
+		if err != nil {
+			return err
+		}
 
-func End(ctx context.Context, err errs.Err) errs.Err {
-	if err != nil {
-		return err
+		tx, err := helpers.GetContextTx(ctx)
+		if err != nil {
+			return err
+		}
+
+		xerr := tx.Commit()
+		if xerr != nil {
+			return errs.NewInternalServerErr(xerr)
+		}
+
+		return nil
 	}
 
-	tx, err := helpers.GetContextTx(ctx)
-	if err != nil {
-		return err
-	}
-
-	xerr := tx.Commit()
-	if xerr != nil {
-		return errs.NewInternalServerErr(xerr)
-	}
-
-	return nil
+	return ctx, end, nil
 }

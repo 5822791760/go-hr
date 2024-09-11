@@ -8,23 +8,17 @@ import (
 	"github.com/go-jet/jet/v2/qrm"
 )
 
-var coreDB *sql.DB
-
 type contextDBKey string
 
 const DBKey contextDBKey = "DBKey"
 
-func InitCoreDB(db *sql.DB) {
-	coreDB = db
-}
-
-func StoreContextDB(ctx context.Context) context.Context {
-	ctx = context.WithValue(ctx, DBKey, coreDB)
+func StoreContextDB(ctx context.Context, db interface{}) context.Context {
+	ctx = context.WithValue(ctx, DBKey, db)
 	return ctx
 }
 
-func StartTransaction(ctx context.Context) (context.Context, errs.Err) {
-	tx, xerr := coreDB.BeginTx(ctx, nil)
+func StartTransaction(ctx context.Context, db Transactionable) (context.Context, errs.Err) {
+	tx, xerr := db.BeginTx(ctx, nil)
 	if xerr != nil {
 		return nil, errs.NewInternalServerErr(xerr)
 	}

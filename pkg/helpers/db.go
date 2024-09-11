@@ -1,10 +1,17 @@
 package helpers
 
 import (
+	"context"
+	"database/sql"
+
 	"github.com/5822791760/hr/pkg/errs"
 	. "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 )
+
+type Transactionable interface {
+	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
+}
 
 func SelectExist() SelectStatement {
 	return SELECT(Int(1))
