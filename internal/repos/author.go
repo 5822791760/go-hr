@@ -50,11 +50,11 @@ func (author *Author) LatestUpdate() *Author {
 }
 
 func (author *Author) Validate(ctx context.Context, repo authorRepo) errs.Err {
-	errContexts := errs.NewErrorContext()
+	errCtx := errs.NewErrorContext()
 	name := author.Name
 
 	if len(name) < 2 {
-		errContexts = append(errContexts, errs.NewAuthorInvalidNameLengthContext())
+		errs.AddAuthorInvalidNameLengthContext(errCtx)
 	}
 
 	nameExist, err := repo.NameExist(ctx, name, int(author.ID))
@@ -63,11 +63,11 @@ func (author *Author) Validate(ctx context.Context, repo authorRepo) errs.Err {
 	}
 
 	if nameExist {
-		errContexts = append(errContexts, errs.NewAuthorNameAlreadyExistContext())
+		errs.AddAuthorNameAlreadyExistContext(errCtx)
 	}
 
-	if len(errContexts) > 0 {
-		return errs.NewAuthorValidateErr(errContexts)
+	if len(errCtx) > 0 {
+		return errs.NewAuthorValidateErr(errCtx)
 	}
 
 	return nil

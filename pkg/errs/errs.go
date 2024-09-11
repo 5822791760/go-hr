@@ -6,7 +6,7 @@ type httpErrContext struct {
 }
 
 type HttpErr struct {
-	Code         uint             `json:"code"`
-	ErrorMessage string           `json:"error_message"`
-	Context      []httpErrContext `json:"context"`
+	Code         uint       `json:"code"`
+	ErrorMessage string     `json:"error_message"`
+	Context      errContext `json:"context"`
 }

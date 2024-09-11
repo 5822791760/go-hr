@@ -2,36 +2,34 @@ package errs
 
 import "net/http"
 
+const (
+	AuthorNameLength = "nameLength"
+	AuthorNameExist  = "nameExist"
+	AuthorNotFound   = "notFound"
+)
+
 func NewAuthorNotFoundErr(err error) Err {
 	return &errBase{
 		Code:         http.StatusNotFound,
 		ErrorMessage: err.Error(),
-		Context: []errBaseContext{{
-			Key:     AuthorNotFoundErrKey,
-			Message: "Author not found",
-		}},
+		Context:      errContext{AuthorNotFound: "Author not found"},
 	}
 }
 
-func NewAuthorValidateErr(errContexts []errBaseContext) Err {
+func NewAuthorValidateErr(errCtx errContext) Err {
 	return &errBase{
 		Code:         http.StatusBadRequest,
 		ErrorMessage: "",
-		Context:      errContexts,
+		Context:      errCtx,
 	}
 }
 
 // ===== Context =====
-func NewAuthorInvalidNameLengthContext() errBaseContext {
-	return errBaseContext{
-		Key:     AuthorInvalidNameLength,
-		Message: "Invalid Author name length",
-	}
+func AddAuthorInvalidNameLengthContext(errCtx errContext) {
+	errCtx[AuthorNameLength] = "Invalid Author name length"
+
 }
 
-func NewAuthorNameAlreadyExistContext() errBaseContext {
-	return errBaseContext{
-		Key:     AuthorNameAlreadyExist,
-		Message: "Author name already exist",
-	}
+func AddAuthorNameAlreadyExistContext(errCtx errContext) {
+	errCtx[AuthorNameExist] = "Author name already exist"
 }
