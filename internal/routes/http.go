@@ -8,12 +8,15 @@ import (
 	"github.com/5822791760/hr/internal/handlers/https"
 	"github.com/5822791760/hr/internal/repos"
 	"github.com/5822791760/hr/internal/usecases"
+	"github.com/5822791760/hr/pkg/helpers"
 	"github.com/go-chi/chi/v5"
 )
 
 func InitRoutes(r *chi.Mux, db *sql.DB) error {
+	clock := helpers.NewClock()
+
 	// Repos
-	authorRepo := repos.NewAuthorRepo()
+	authorRepo := repos.NewAuthorRepo(clock)
 
 	// Use Case
 	authorUsecase := usecases.NewAuthorUseCase(authorRepo)

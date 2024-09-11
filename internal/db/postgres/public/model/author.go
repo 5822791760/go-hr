@@ -14,7 +14,7 @@ import (
 type Author struct {
 	ID        int32 `sql:"primary_key"`
 	Name      string
-	Bio       *string
+	Bio       string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

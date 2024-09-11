@@ -2,7 +2,11 @@ package helpers
 
 import "time"
 
-func CurrentTime() string {
-	currentTime := time.Now()
-	return currentTime.Format(time.RFC3339)
+type realClock struct{}
+
+func (realClock) Now() time.Time                         { return time.Now() }
+func (realClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
+
+func NewClock() realClock {
+	return realClock{}
 }

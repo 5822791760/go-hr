@@ -3,7 +3,7 @@
 CREATE TABLE author (
   id   SERIAL PRIMARY KEY,
   name text      NOT NULL,
-  bio  text,
+  bio  text      NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );

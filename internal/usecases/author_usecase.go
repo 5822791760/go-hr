@@ -37,9 +37,9 @@ func (u authorUsecase) QueryGetAll(ctx context.Context) ([]repos.QueryAuthorGetA
 // ============================== FindOne ==============================
 
 type FindOneAuthorResponse struct {
-	ID   int     `json:"id"`
-	Name string  `json:"name"`
-	Bio  *string `json:"bio"`
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Bio  string `json:"bio"`
 }
 
 func (u authorUsecase) FindOne(ctx context.Context, id int) (FindOneAuthorResponse, errs.Err) {
@@ -67,7 +67,7 @@ type CreateAuthorResponse struct {
 }
 
 func (u authorUsecase) Create(ctx context.Context, body CreateAuthorBody) (CreateAuthorResponse, errs.Err) {
-	author := repos.NewAuthor(body.Name, body.Bio)
+	author := u.authorRepo.NewAuthor(body.Name, body.Bio)
 	if err := u.authorRepo.Save(ctx, author); err != nil {
 		return CreateAuthorResponse{}, err
 	}
@@ -96,9 +96,8 @@ func (u authorUsecase) Update(ctx context.Context, id int, body UpdateAuthorBody
 		return UpdateAuthorResponse{}, err
 	}
 
-	author.
-		ChangeName(body.Name).
-		ChangeBio(body.Bio)
+	author.Name = body.Name
+	author.Bio = body.Bio
 
 	if err := u.authorRepo.Save(ctx, author); err != nil {
 		return UpdateAuthorResponse{}, err
