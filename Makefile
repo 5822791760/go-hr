@@ -7,7 +7,13 @@ DB_STRING="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:$
 MIGRATION_DIR="./internal/db/migrations"
 
 .wait-for-pg:
-	./internal/scripts/wait-for-postgres.sh
+	./scripts/wait-for-postgres.sh
+	
+
+.install-depen:
+	go install github.com/air-verse/air@latest
+	go install github.com/pressly/goose/v3/cmd/goose@latest
+	go install github.com/go-jet/jet/v2/cmd/jet@latest
 
 up:
 	docker-compose up -d
@@ -16,16 +22,16 @@ down:
 	docker-compose down --remove-orphans
 
 dev: up .wait-for-pg
-	./internal/scripts/air -c .air.toml
+	./scripts/air -c .air.toml
 
 build:
-	go build -o ./internal/scripts ./cmd/backend
+	go build -o ./scripts ./cmd/backend
 
 start:
-	./internal/scripts/api
+	./scripts/api
 
 gen:
-	./internal/scripts/jet -dsn=${DB_STRING} -path=./internal/db/schema
+	./scripts/jet -dsn=${DB_STRING} -path=./internal/db/schema
 
 drop-db:
 	docker-compose up -d postgres
@@ -36,19 +42,19 @@ drop-db:
 reset-db: drop-db db-up gen
 
 db-status:
-	./internal/scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} status
+	./scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} status
 
 db-up:
-	./internal/scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} up
+	./scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} up
 
 db-down:
-	./internal/scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} down
+	./scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} down
 
 db-redo:
-	./internal/scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} redo
+	./scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} redo
 
 db-new:
-	./internal/scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} create ${name} sql
+	./scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} create ${name} sql
 
 
 mock-irepo:
@@ -58,3 +64,9 @@ mock-irepo:
 		mockpath=test/mocks/repos/mock_$$(basename $$dirname)/mock_$$basefile; \
 		mockgen -source=$$file -destination=$$mockpath -package=mock_$$(basename mock_$$dirname); \
 	done
+
+test-backend:
+	go test ./test/backend/...
+
+doc:
+	./scripts/godoc -http :8080

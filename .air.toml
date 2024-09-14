@@ -1,10 +1,11 @@
 root = "."
 testdata_dir = "testdata"
+tmp_dir = "./scripts"
 
 [build]
   args_bin = []
-  bin = "./internal/scripts/backend"
-  cmd = "go build -o ./internal/scripts ./cmd/backend"
+  bin = "./scripts/backend"
+  cmd = "go build -o ./scripts ./cmd/backend"
   delay = 1000
   exclude_dir = ["docs"]
   exclude_file = []

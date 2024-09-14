@@ -1,3 +1,4 @@
+// Package configs provide config from .env to serve backend.
 package configs
 
 import (
@@ -6,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// All Avaliable config
 type config struct {
 	DBHost     string
 	DBPort     string
@@ -17,6 +19,7 @@ type config struct {
 
 var BackendConfig config
 
+// This will be call on started to load config into variable
 func LoadConfig() error {
 	viper.AutomaticEnv()
 
@@ -38,6 +41,7 @@ func LoadConfig() error {
 	return nil
 }
 
+// For database connection
 func GetDBConnectionString() string {
 	return fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable",
 		BackendConfig.DBUser,
@@ -48,6 +52,7 @@ func GetDBConnectionString() string {
 	)
 }
 
+// For jwt token
 func GetJwtSecret() string {
 	return BackendConfig.JwtSecret
 }

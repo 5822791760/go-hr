@@ -1,0 +1,22 @@
+meta {
+  name: GET authors :id
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{url}}/authors/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "name": "rober",
+    "bio": "test123"
+  }
+}
