@@ -58,7 +58,7 @@ db-new:
 
 
 mock-irepo:
-	@find internal/repos -name '*.go' ! -name 'entity.go' | while read file; do \
+	@find internal/backend/repos -name '*.go' ! -name 'entity.go' | while read file; do \
 		dirname=$$(dirname $$file); \
 		basefile=$$(basename $$file); \
 		mockpath=test/mocks/repos/mock_$$(basename $$dirname)/mock_$$basefile; \
@@ -70,3 +70,15 @@ test-backend:
 
 doc:
 	./scripts/godoc -http :8080
+
+mdoc:
+	@find docs/backend -name '*.md' | while read file; do \
+		dirname=$$(dirname $$file); \
+		basefile=$$(basename $$file); \
+		foldername=$$(basename $$file .md); \
+		mkdir -p doc/backend/flow/$$foldername; \
+		mmdc -i $$file -o doc/backend/flow/$$foldername/flow_$$basefile; \
+	done
+
+doc-run:
+	docsify serve docs -p 3002

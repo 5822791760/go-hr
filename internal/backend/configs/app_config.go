@@ -17,6 +17,7 @@ type config struct {
 	JwtSecret  string
 }
 
+// All Config will be loaded into here
 var BackendConfig config
 
 // This will be call on started to load config into variable
