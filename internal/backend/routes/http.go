@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/5822791760/hr/internal/backend/handlers/https"
+	"github.com/5822791760/hr/internal/backend/handlers/httpv1"
 	"github.com/5822791760/hr/internal/backend/repos/authorrepo"
 	"github.com/5822791760/hr/internal/backend/usecases/authorusecase"
 	"github.com/5822791760/hr/pkg/coreutil"
@@ -23,15 +23,15 @@ func InitRoutes(r *chi.Mux, db *sql.DB) error {
 	authorUsecase := authorusecase.NewAuthorUseCase(authorReadRepo, authorWriteRepo)
 
 	// Handlers
-	authorHandler := https.NewAuthorHandler(db, authorUsecase)
+	authorHandler := httpv1.NewAuthorHandler(db, authorUsecase)
 
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
-			r.Get("/authors", authorHandler.QueryAuthors)
-			r.Get("/authors/{id}", authorHandler.FindOne)
-			r.Post("/authors", authorHandler.CreateAuthor)
-			r.Put("/authors/{id}", authorHandler.UpdateAuthor)
-			r.Delete("/authors/{id}", authorHandler.DeleteAuthor)
+			r.Get("/authors", authorHandler.GetAll)
+			r.Get("/authors/{id}", authorHandler.GetOne)
+			r.Post("/authors", authorHandler.Create)
+			r.Put("/authors/{id}", authorHandler.Update)
+			r.Delete("/authors/{id}", authorHandler.Delete)
 		})
 	})
 

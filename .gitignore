@@ -29,4 +29,3 @@ _docker_volumes/*
 
 # Others
 tmp/*
-internal/scripts/app
