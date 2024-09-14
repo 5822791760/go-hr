@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	authorrepo "github.com/5822791760/hr/internal/repos/authorrepo"
+	authorrepo "github.com/5822791760/hr/internal/backend/repos/authorrepo"
 	apperr "github.com/5822791760/hr/pkg/apperr"
 	gomock "go.uber.org/mock/gomock"
 )

@@ -19,7 +19,7 @@ dev: up .wait-for-pg
 	./internal/scripts/air -c .air.toml
 
 build:
-	go build -o ./internal/scripts ./cmd/app
+	go build -o ./internal/scripts ./cmd/backend
 
 start:
 	./internal/scripts/api
