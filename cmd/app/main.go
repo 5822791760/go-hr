@@ -10,8 +10,9 @@ import (
 	"syscall"
 
 	"github.com/5822791760/hr/internal/configs"
-	"github.com/5822791760/hr/internal/db/postgres"
+	"github.com/5822791760/hr/internal/db/migrations"
 	"github.com/5822791760/hr/internal/routes"
+	"github.com/5822791760/hr/pkg/dbutil"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -23,11 +24,19 @@ func main() {
 
 	ctx := context.Background()
 
-	db, err := postgres.ConnectDB(ctx, configs.GetDBConnectionString())
+	db, err := dbutil.ConnectDB(ctx, dbutil.ConnectOptions{
+		Connection: configs.GetDBConnectionString(),
+		Logging:    true,
+	})
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
+
+	err = dbutil.AutoMigrate(db, migrations.NewHrMigration)
+	if err != nil {
+		panic(err)
+	}
 
 	r := chi.NewRouter()
 

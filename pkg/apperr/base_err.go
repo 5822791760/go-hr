@@ -1,4 +1,4 @@
-package errs
+package apperr
 
 type errContext = map[string]string
 
@@ -24,17 +24,3 @@ func (e *errBase) Error() string {
 func (e *errBase) AddContext(key string, msg string) {
 	e.Context[key] = msg
 }
-
-// ====== HTTP =======
-
-func (e *errBase) ToHttp() HttpErr {
-	err := HttpErr{
-		Code:         e.Code,
-		ErrorMessage: e.ErrorMessage,
-		Context:      e.Context,
-	}
-
-	return err
-}
-
-// ====== HTTP =======

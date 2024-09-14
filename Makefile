@@ -4,6 +4,7 @@ ifneq (,$(wildcard ./.env))
 endif
 
 DB_STRING="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable"
+MIGRATION_DIR="./internal/db/migrations"
 
 .wait-for-pg:
 	./internal/scripts/wait-for-postgres.sh
@@ -24,7 +25,7 @@ start:
 	./internal/scripts/api
 
 gen:
-	./internal/scripts/jet -dsn=${DB_STRING} -schema=public -path=./internal/db
+	./internal/scripts/jet -dsn=${DB_STRING} -path=./internal/db/schema
 
 drop-db:
 	docker-compose up -d postgres
@@ -35,16 +36,25 @@ drop-db:
 reset-db: drop-db db-up gen
 
 db-status:
-	./internal/scripts/goose -dir="./internal/db/postgres/migrations" postgres ${DB_STRING} status
+	./internal/scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} status
 
 db-up:
-	./internal/scripts/goose -dir="./internal/db/postgres/migrations" postgres ${DB_STRING} up
+	./internal/scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} up
 
 db-down:
-	./internal/scripts/goose -dir="./internal/db/postgres/migrations" postgres ${DB_STRING} down
+	./internal/scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} down
 
 db-redo:
-	./internal/scripts/goose -dir="./internal/db/postgres/migrations" postgres ${DB_STRING} redo
+	./internal/scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} redo
 
 db-new:
-	./internal/scripts/goose -dir="./internal/db/postgres/migrations" postgres ${DB_STRING} create ${name} sql
+	./internal/scripts/goose -dir=${MIGRATION_DIR} postgres ${DB_STRING} create ${name} sql
+
+
+mock-irepo:
+	@find internal/repos -name '*.go' ! -name 'entity.go' | while read file; do \
+		dirname=$$(dirname $$file); \
+		basefile=$$(basename $$file); \
+		mockpath=test/mocks/repos/mock_$$(basename $$dirname)/mock_$$basefile; \
+		mockgen -source=$$file -destination=$$mockpath -package=mock_$$(basename mock_$$dirname); \
+	done

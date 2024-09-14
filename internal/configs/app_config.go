@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
+type config struct {
 	DBHost     string
 	DBPort     string
 	DBName     string
@@ -15,7 +15,7 @@ type Config struct {
 	JwtSecret  string
 }
 
-var AppConfig Config
+var BackendConfig config
 
 func LoadConfig() error {
 	viper.AutomaticEnv()
@@ -26,7 +26,7 @@ func LoadConfig() error {
 		return err
 	}
 
-	AppConfig = Config{
+	BackendConfig = config{
 		DBHost:     viper.GetString("POSTGRES_HOST"),
 		DBPort:     viper.GetString("POSTGRES_PORT"),
 		DBName:     viper.GetString("POSTGRES_DB"),
@@ -40,14 +40,14 @@ func LoadConfig() error {
 
 func GetDBConnectionString() string {
 	return fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable",
-		AppConfig.DBUser,
-		AppConfig.DBPassword,
-		AppConfig.DBHost,
-		AppConfig.DBPort,
-		AppConfig.DBName,
+		BackendConfig.DBUser,
+		BackendConfig.DBPassword,
+		BackendConfig.DBHost,
+		BackendConfig.DBPort,
+		BackendConfig.DBName,
 	)
 }
 
 func GetJwtSecret() string {
-	return AppConfig.JwtSecret
+	return BackendConfig.JwtSecret
 }

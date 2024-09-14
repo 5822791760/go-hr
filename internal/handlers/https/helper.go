@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/5822791760/hr/pkg/errs"
-	"github.com/5822791760/hr/pkg/helpers"
+	"github.com/5822791760/hr/pkg/apperr"
+	"github.com/5822791760/hr/pkg/coreutil"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -20,7 +20,7 @@ func WriteJSON(w http.ResponseWriter, statusCode int, data interface{}) {
 }
 
 type httpError interface {
-	ToHttp() errs.HttpErr
+	ToHttp() apperr.HttpErr
 }
 
 func WriteError(w http.ResponseWriter, err httpError) {
@@ -37,16 +37,16 @@ func WriteError(w http.ResponseWriter, err httpError) {
 	}
 }
 
-func GetParam(r *http.Request, key string) (string, errs.Err) {
+func GetParam(r *http.Request, key string) (string, apperr.Err) {
 	data := chi.URLParam(r, key)
 	if data == "" {
-		return "", errs.NewQueryNotExistErr(key)
+		return "", apperr.NewQueryNotExistErr(key)
 	}
 
 	return data, nil
 }
 
-func GetParamInt(r *http.Request, key string) (int, errs.Err) {
+func GetParamInt(r *http.Request, key string) (int, apperr.Err) {
 	query, err := GetParam(r, key)
 	if err != nil {
 		return 0, err
@@ -54,24 +54,24 @@ func GetParamInt(r *http.Request, key string) (int, errs.Err) {
 
 	data, xerr := strconv.Atoi(query)
 	if xerr != nil {
-		return 0, errs.NewInternalServerErr(xerr)
+		return 0, apperr.NewInternalServerErr(xerr)
 	}
 
 	return data, nil
 }
 
-func GetQuery(r *http.Request, key string) (string, errs.Err) {
+func GetQuery(r *http.Request, key string) (string, apperr.Err) {
 	query := r.URL.Query()
 	data := query.Get(key)
 
 	if data == "" {
-		return "", errs.NewQueryNotExistErr(key)
+		return "", apperr.NewQueryNotExistErr(key)
 	}
 
 	return data, nil
 }
 
-func GetQueryInt(r *http.Request, key string) (int, errs.Err) {
+func GetQueryInt(r *http.Request, key string) (int, apperr.Err) {
 	query, err := GetQuery(r, key)
 	if err != nil {
 		return 0, err
@@ -79,18 +79,18 @@ func GetQueryInt(r *http.Request, key string) (int, errs.Err) {
 
 	data, xerr := strconv.Atoi(query)
 	if xerr != nil {
-		return 0, errs.NewInternalServerErr(xerr)
+		return 0, apperr.NewInternalServerErr(xerr)
 	}
 
 	return data, nil
 }
 
-func ParseBody(r *http.Request, dest interface{}) errs.Err {
+func ParseBody(r *http.Request, dest interface{}) apperr.Err {
 	decoder := json.NewDecoder(r.Body)
 	defer r.Body.Close()
 
 	if xerr := decoder.Decode(dest); xerr != nil {
-		return errs.NewInternalServerErr(xerr)
+		return apperr.NewInternalServerErr(xerr)
 	}
 
 	return nil
@@ -98,30 +98,30 @@ func ParseBody(r *http.Request, dest interface{}) errs.Err {
 
 func GetContext(r *http.Request, db interface{}) context.Context {
 	ctx := r.Context()
-	return helpers.StoreContextDB(ctx, db)
+	return coreutil.StoreContextDB(ctx, db)
 }
 
-func GetTxContext(r *http.Request, tx helpers.Transactionable) (context.Context, func(err errs.Err) errs.Err, errs.Err) {
+func GetTxContext(r *http.Request, tx coreutil.Transactionable) (context.Context, func(err apperr.Err) apperr.Err, apperr.Err) {
 	ctx := r.Context()
 
-	ctx, err := helpers.StartTransaction(ctx, tx)
+	ctx, err := coreutil.StartTransaction(ctx, tx)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	end := func(err errs.Err) errs.Err {
+	end := func(err apperr.Err) apperr.Err {
 		if err != nil {
 			return err
 		}
 
-		tx, err := helpers.GetContextTx(ctx)
+		tx, err := coreutil.GetContextTx(ctx)
 		if err != nil {
 			return err
 		}
 
 		xerr := tx.Commit()
 		if xerr != nil {
-			return errs.NewInternalServerErr(xerr)
+			return apperr.NewInternalServerErr(xerr)
 		}
 
 		return nil

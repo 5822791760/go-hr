@@ -3,17 +3,17 @@ package https
 import (
 	"net/http"
 
-	"github.com/5822791760/hr/internal/usecases"
-	"github.com/5822791760/hr/pkg/errs"
-	"github.com/5822791760/hr/pkg/helpers"
+	"github.com/5822791760/hr/internal/usecases/authorusecase"
+	"github.com/5822791760/hr/pkg/apperr"
+	"github.com/5822791760/hr/pkg/coreutil"
 )
 
 type AuthorHandler struct {
-	db            helpers.Transactionable
-	authorUsecase usecases.IAuthorUsecase
+	db            coreutil.Transactionable
+	authorUsecase authorusecase.IAuthorUsecase
 }
 
-func NewAuthorHandler(db helpers.Transactionable, authorUsecase usecases.IAuthorUsecase) AuthorHandler {
+func NewAuthorHandler(db coreutil.Transactionable, authorUsecase authorusecase.IAuthorUsecase) AuthorHandler {
 	return AuthorHandler{
 		db:            db,
 		authorUsecase: authorUsecase,
@@ -21,14 +21,14 @@ func NewAuthorHandler(db helpers.Transactionable, authorUsecase usecases.IAuthor
 }
 
 func (h AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
-	var err errs.Err
+	var err apperr.Err
 	ctx, end, err := GetTxContext(r, h.db)
 
 	defer func() {
 		WriteError(w, end(err))
 	}()
 
-	var body usecases.CreateAuthorBody
+	var body authorusecase.CreateAuthorBody
 	if err := ParseBody(r, &body); err != nil {
 		return
 	}
@@ -42,14 +42,14 @@ func (h AuthorHandler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h AuthorHandler) QueryAuthors(w http.ResponseWriter, r *http.Request) {
-	var err errs.Err
+	var err apperr.Err
 	ctx := GetContext(r, h.db)
 
 	defer func() {
 		WriteError(w, err)
 	}()
 
-	resp, err := h.authorUsecase.QueryGetAll(ctx)
+	resp, err := h.authorUsecase.GetAll(ctx)
 	if err != nil {
 		return
 	}
@@ -58,7 +58,7 @@ func (h AuthorHandler) QueryAuthors(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h AuthorHandler) FindOne(w http.ResponseWriter, r *http.Request) {
-	var err errs.Err
+	var err apperr.Err
 	ctx := GetContext(r, h.db)
 
 	defer func() {
@@ -70,7 +70,7 @@ func (h AuthorHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := h.authorUsecase.FindOne(ctx, id)
+	res, err := h.authorUsecase.GetOne(ctx, id)
 	if err != nil {
 		return
 	}
@@ -79,7 +79,7 @@ func (h AuthorHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
-	var err errs.Err
+	var err apperr.Err
 	ctx, end, err := GetTxContext(r, h.db)
 
 	defer func() {
@@ -91,7 +91,7 @@ func (h AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var body usecases.UpdateAuthorBody
+	var body authorusecase.UpdateAuthorBody
 	if err := ParseBody(r, &body); err != nil {
 		return
 	}
@@ -105,7 +105,7 @@ func (h AuthorHandler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h AuthorHandler) DeleteAuthor(w http.ResponseWriter, r *http.Request) {
-	var err errs.Err
+	var err apperr.Err
 	ctx, end, err := GetTxContext(r, h.db)
 
 	defer func() {
