@@ -72,13 +72,15 @@ doc:
 	./scripts/godoc -http :8080
 
 mdoc:
-	@find docs/backend -name '*.md' | while read file; do \
+	@find docs/backend -name '*.md' ! -name 'erdiagram.md' | while read file; do \
 		dirname=$$(dirname $$file); \
 		basefile=$$(basename $$file); \
-		foldername=$$(basename $$file .md); \
-		mkdir -p doc/backend/flow/$$foldername; \
-		mmdc -i $$file -o doc/backend/flow/$$foldername/flow_$$basefile; \
+		rawname=$$(basename $$file .md); \
+		mmdc -i $$file -o docs/backend/flow/$$rawname.png -t dark -b transparent; \
 	done
+
+mdoc-er:
+	mmdc -i docs/backend/template/erdiagram.md -o docs/backend/erdiagram.png -t dark -b transparent
 
 doc-run:
 	docsify serve docs -p 3002

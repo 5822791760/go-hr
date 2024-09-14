@@ -87,10 +87,10 @@ func (mr *MockIReadRepoMockRecorder) NameExist(ctx, name, id any) *gomock.Call {
 }
 
 // QueryGetAll mocks base method.
-func (m *MockIReadRepo) QueryGetAll(ctx context.Context) ([]authorrepo.QueryAuthorGetAll, apperr.Err) {
+func (m *MockIReadRepo) QueryGetAll(ctx context.Context) ([]authorrepo.QueryGetAll, apperr.Err) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "QueryGetAll", ctx)
-	ret0, _ := ret[0].([]authorrepo.QueryAuthorGetAll)
+	ret0, _ := ret[0].([]authorrepo.QueryGetAll)
 	ret1, _ := ret[1].(apperr.Err)
 	return ret0, ret1
 }

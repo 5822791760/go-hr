@@ -9,10 +9,10 @@ import (
 
 // ============================== Usecase ==============================
 
-func (u authorUsecase) GetAll(ctx context.Context) ([]authorrepo.QueryAuthorGetAll, apperr.Err) {
+func (u authorUsecase) GetAll(ctx context.Context) ([]authorrepo.QueryGetAll, apperr.Err) {
 	datas, err := u.authorReadRepo.QueryGetAll(ctx)
 	if err != nil {
-		return []authorrepo.QueryAuthorGetAll{}, err
+		return []authorrepo.QueryGetAll{}, err
 	}
 
 	return datas, nil

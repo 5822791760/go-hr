@@ -18,7 +18,7 @@ func TestGetAll(t *testing.T) {
 	mockRead, mockWrite := mocks.GetMockAuthorRepo(ctrl)
 	ctx := context.TODO()
 
-	authors := []authorrepo.QueryAuthorGetAll{
+	authors := []authorrepo.QueryGetAll{
 		{ID: 1, Name: "Author 1"},
 		{ID: 2, Name: "Author 2"},
 	}

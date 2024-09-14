@@ -19,7 +19,7 @@ func NewReadRepo() readRepo {
 type IReadRepo interface {
 	FindAll(ctx context.Context) ([]Author, apperr.Err)
 	FindOne(ctx context.Context, id int) (*Author, apperr.Err)
-	QueryGetAll(ctx context.Context) ([]QueryAuthorGetAll, apperr.Err)
+	QueryGetAll(ctx context.Context) ([]QueryGetAll, apperr.Err)
 	NameExist(ctx context.Context, name string, id int) (bool, apperr.Err)
 	Validate(ctx context.Context, author *Author) apperr.Err
 }
@@ -106,18 +106,18 @@ func (r readRepo) Validate(ctx context.Context, author *Author) apperr.Err {
 
 // ========= QueryGetAll =========
 
-type QueryAuthorGetAll struct {
+type QueryGetAll struct {
 	ID   int32  `json:"id"`
 	Name string `json:"name"`
 }
 
-func (r readRepo) QueryGetAll(ctx context.Context) ([]QueryAuthorGetAll, apperr.Err) {
+func (r readRepo) QueryGetAll(ctx context.Context) ([]QueryGetAll, apperr.Err) {
 	db, err := coreutil.GetDB(ctx)
 	if err != nil {
-		return []QueryAuthorGetAll{}, err
+		return []QueryGetAll{}, err
 	}
 
-	data := []QueryAuthorGetAll{}
+	data := []QueryGetAll{}
 
 	q := SELECT(
 		table.Author.ID.AS("QueryAuthorGetAll.ID"),
@@ -125,7 +125,7 @@ func (r readRepo) QueryGetAll(ctx context.Context) ([]QueryAuthorGetAll, apperr.
 	).FROM(table.Author)
 
 	if xerr := q.QueryContext(ctx, db, &data); xerr != nil {
-		return []QueryAuthorGetAll{}, apperr.NewInternalServerErr(xerr)
+		return []QueryGetAll{}, apperr.NewInternalServerErr(xerr)
 	}
 
 	return data, nil

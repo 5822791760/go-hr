@@ -14,7 +14,7 @@ type authorUsecase struct {
 
 type IAuthorUsecase interface {
 	Create(ctx context.Context, body CreateAuthorBody) (CreateAuthorResponse, apperr.Err)
-	GetAll(ctx context.Context) ([]authorrepo.QueryAuthorGetAll, apperr.Err)
+	GetAll(ctx context.Context) ([]authorrepo.QueryGetAll, apperr.Err)
 	GetOne(ctx context.Context, id int) (FindOneAuthorResponse, apperr.Err)
 	Update(ctx context.Context, id int, body UpdateAuthorBody) (UpdateAuthorResponse, apperr.Err)
 	Delete(ctx context.Context, id int) (DeleteAuthorResponse, apperr.Err)
