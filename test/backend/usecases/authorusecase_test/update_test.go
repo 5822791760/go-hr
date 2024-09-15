@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/5822791760/hr/internal/backend/repos/authorrepo"
+	"github.com/5822791760/hr/internal/backend/repos"
 	"github.com/5822791760/hr/internal/backend/usecases/authorusecase"
-	"github.com/5822791760/hr/test/mocks"
+	"github.com/5822791760/hr/test/mocks/mockrepo"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
@@ -15,22 +15,22 @@ func TestUpdate(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockRead, mockWrite := mocks.GetMockAuthorRepo(ctrl)
+	mockRepo := mockrepo.NewMockIAuthorRepo(ctrl)
 	ctx := context.TODO()
 
 	id := 1
 	body := authorusecase.UpdateAuthorBody{Name: "Updated Author", Bio: "Updated Bio"}
-	author := &authorrepo.Author{ID: int32(id), Name: "Author 1", Bio: ""}
+	author := &repos.Author{ID: int32(id), Name: "Author 1", Bio: ""}
 
-	mockRead.EXPECT().
+	mockRepo.EXPECT().
 		FindOne(ctx, id).
 		Return(author, nil)
 
-	mockWrite.EXPECT().
-		Save(ctx, &authorrepo.Author{ID: 1, Name: "Updated Author", Bio: "Updated Bio"}).
+	mockRepo.EXPECT().
+		Save(ctx, &repos.Author{ID: 1, Name: "Updated Author", Bio: "Updated Bio"}).
 		Return(nil)
 
-	usecase := authorusecase.NewAuthorUseCase(mockRead, mockWrite)
+	usecase := authorusecase.NewAuthorUseCase(mockRepo)
 	res, err := usecase.Update(ctx, id, body)
 
 	assert.NoError(t, err)

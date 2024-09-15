@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/5822791760/hr/internal/backend/handlers/httpv1"
-	"github.com/5822791760/hr/internal/backend/repos/authorrepo"
+	"github.com/5822791760/hr/internal/backend/repos"
 	"github.com/5822791760/hr/internal/backend/usecases/authorusecase"
 	"github.com/5822791760/hr/pkg/coreutil"
 	"github.com/go-chi/chi/v5"
@@ -16,11 +16,10 @@ func InitRoutes(r *chi.Mux, db *sql.DB) error {
 	clock := coreutil.NewClock()
 
 	// Author Repo
-	authorReadRepo := authorrepo.NewReadRepo()
-	authorWriteRepo := authorrepo.NewWriteRepo(authorReadRepo, clock)
+	authorRepo := repos.NewAuthorRepo(clock)
 
 	// Use Case
-	authorUsecase := authorusecase.NewAuthorUseCase(authorReadRepo, authorWriteRepo)
+	authorUsecase := authorusecase.NewAuthorUseCase(authorRepo)
 
 	// Handlers
 	authorHandler := httpv1.NewAuthorHandler(db, authorUsecase)

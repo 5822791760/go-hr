@@ -58,11 +58,11 @@ db-new:
 
 
 mock-irepo:
-	@find internal/backend/repos -name '*.go' ! -name 'entity.go' | while read file; do \
+	@find internal/backend/repos -name '*.go' | while read file; do \
 		dirname=$$(dirname $$file); \
 		basefile=$$(basename $$file); \
-		mockpath=test/mocks/repos/mock_$$(basename $$dirname)/mock_$$basefile; \
-		mockgen -source=$$file -destination=$$mockpath -package=mock_$$(basename mock_$$dirname); \
+		mockpath=test/mocks/mockrepo/mock_$$basefile; \
+		mockgen -source=$$file -destination=$$mockpath -package=mockrepo; \
 	done
 
 test-backend:

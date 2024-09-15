@@ -17,7 +17,7 @@ type FindOneAuthorResponse struct {
 // ============================== Usecase ==============================
 
 func (u authorUsecase) GetOne(ctx context.Context, id int) (FindOneAuthorResponse, apperr.Err) {
-	author, err := u.authorReadRepo.FindOne(ctx, id)
+	author, err := u.authorRepo.FindOne(ctx, id)
 	if err != nil {
 		return FindOneAuthorResponse{}, err
 	}

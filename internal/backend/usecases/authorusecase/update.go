@@ -23,7 +23,7 @@ type UpdateAuthorResponse struct {
 // ============================== Usecase ==============================
 
 func (u authorUsecase) Update(ctx context.Context, id int, body UpdateAuthorBody) (UpdateAuthorResponse, apperr.Err) {
-	author, err := u.authorReadRepo.FindOne(ctx, id)
+	author, err := u.authorRepo.FindOne(ctx, id)
 	if err != nil {
 		return UpdateAuthorResponse{}, err
 	}
@@ -31,7 +31,7 @@ func (u authorUsecase) Update(ctx context.Context, id int, body UpdateAuthorBody
 	author.Name = body.Name
 	author.Bio = body.Bio
 
-	if err := u.authorWriteRepo.Save(ctx, author); err != nil {
+	if err := u.authorRepo.Save(ctx, author); err != nil {
 		return UpdateAuthorResponse{}, err
 	}
 

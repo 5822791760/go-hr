@@ -3,7 +3,7 @@ package repos_test
 import (
 	"testing"
 
-	"github.com/5822791760/hr/internal/backend/repos/authorrepo"
+	"github.com/5822791760/hr/internal/backend/repos"
 	"github.com/5822791760/hr/pkg/testutil"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
@@ -12,6 +12,7 @@ import (
 func TestAuthorRepo_FindAll(t *testing.T) {
 	// Arrange
 	ctx, mockDB := testutil.GetDBContext()
+	clock, _ := testutil.GetFakeClock()
 
 	rows := sqlmock.NewRows([]string{"id", "name", "bio"}).AddRow(0, "test", "test")
 	mockDB.ExpectQuery(`
@@ -26,7 +27,7 @@ func TestAuthorRepo_FindAll(t *testing.T) {
 		WillReturnRows(rows)
 
 	// Act
-	repo := authorrepo.NewReadRepo()
+	repo := repos.NewAuthorRepo(clock)
 	_, err := repo.FindAll(ctx)
 
 	// Assert
@@ -37,6 +38,7 @@ func TestAuthorRepo_FindAll(t *testing.T) {
 func TestAuthorRepo_FindOne(t *testing.T) {
 	// Arrange
 	ctx, mockDB := testutil.GetDBContext()
+	clock, _ := testutil.GetFakeClock()
 
 	rows := sqlmock.NewRows([]string{"id", "name", "bio"}).AddRow(0, "test", "test")
 	id := 0
@@ -56,7 +58,7 @@ func TestAuthorRepo_FindOne(t *testing.T) {
 		WillReturnRows(rows)
 
 	// Act
-	repo := authorrepo.NewReadRepo()
+	repo := repos.NewAuthorRepo(clock)
 	_, err := repo.FindOne(ctx, id)
 
 	// Assert

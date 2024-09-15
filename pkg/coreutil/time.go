@@ -13,5 +13,5 @@ func NewClock() realClock {
 	return realClock{}
 }
 
-func (realClock) Now() time.Time                         { return time.Now() }
+func (realClock) Now() time.Time                         { return time.Time{} }
 func (realClock) After(d time.Duration) <-chan time.Time { return time.After(d) }

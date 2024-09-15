@@ -23,8 +23,8 @@ type CreateAuthorResponse struct {
 // ============================== Usecase ==============================
 
 func (u authorUsecase) Create(ctx context.Context, body CreateAuthorBody) (CreateAuthorResponse, apperr.Err) {
-	author := u.authorWriteRepo.NewAuthor(body.Name, body.Bio)
-	if err := u.authorWriteRepo.Save(ctx, author); err != nil {
+	author := u.authorRepo.NewAuthor(body.Name, body.Bio)
+	if err := u.authorRepo.Save(ctx, author); err != nil {
 		return CreateAuthorResponse{}, err
 	}
 

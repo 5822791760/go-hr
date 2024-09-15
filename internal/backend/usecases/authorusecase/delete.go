@@ -15,7 +15,7 @@ type DeleteAuthorResponse struct {
 // ============================== Usecase ==============================
 
 func (u authorUsecase) Delete(ctx context.Context, id int) (DeleteAuthorResponse, apperr.Err) {
-	err := u.authorWriteRepo.Delete(ctx, id)
+	err := u.authorRepo.Delete(ctx, id)
 	if err != nil {
 		return DeleteAuthorResponse{}, err
 	}
