@@ -27,7 +27,7 @@ func TestGetOne(t *testing.T) {
 	res, err := usecase.GetOne(ctx, 1)
 
 	assert.NoError(t, err)
-	assert.Equal(t, authorusecase.FindOneAuthorResponse{
+	assert.Equal(t, authorusecase.GetOneResp{
 		ID:   1,
 		Name: "Author 1",
 		Bio:  "",

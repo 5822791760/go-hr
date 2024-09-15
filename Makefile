@@ -4,7 +4,7 @@ ifneq (,$(wildcard ./.env))
 endif
 
 DB_STRING="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable"
-MIGRATION_DIR="./internal/db/migrations"
+MIGRATION_DIR="./internal/backend//db/migrations/hr"
 
 .wait-for-pg:
 	./scripts/wait-for-postgres.sh

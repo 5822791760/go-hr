@@ -12,7 +12,25 @@ post {
 
 body:json {
   {
-    "name": "robertx",
+    "name": "robertxx",
     "bio": "is a good author"
   }
+}
+
+docs {
+  # Request
+  ```
+  interface Request {
+    name: string;
+    bio:  string;
+  }
+  ```
+
+  # Response
+  ```
+  interface Response {
+    id:   number;
+    name: string;
+  }
+  ```
 }

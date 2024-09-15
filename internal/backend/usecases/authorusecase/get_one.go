@@ -8,7 +8,7 @@ import (
 
 // ============================== Response =============================
 
-type FindOneAuthorResponse struct {
+type GetOneResp struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 	Bio  string `json:"bio"`
@@ -16,13 +16,13 @@ type FindOneAuthorResponse struct {
 
 // ============================== Usecase ==============================
 
-func (u authorUsecase) GetOne(ctx context.Context, id int) (FindOneAuthorResponse, apperr.Err) {
+func (u authorUsecase) GetOne(ctx context.Context, id int) (GetOneResp, apperr.Err) {
 	author, err := u.authorRepo.FindOne(ctx, id)
 	if err != nil {
-		return FindOneAuthorResponse{}, err
+		return GetOneResp{}, err
 	}
 
-	return FindOneAuthorResponse{
+	return GetOneResp{
 		ID:   int(author.ID),
 		Name: author.Name,
 		Bio:  author.Bio,

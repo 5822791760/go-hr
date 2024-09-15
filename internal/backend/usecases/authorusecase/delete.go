@@ -8,19 +8,19 @@ import (
 
 // ============================== Response =============================
 
-type DeleteAuthorResponse struct {
+type DeleteResp struct {
 	Success bool `json:"success"`
 }
 
 // ============================== Usecase ==============================
 
-func (u authorUsecase) Delete(ctx context.Context, id int) (DeleteAuthorResponse, apperr.Err) {
+func (u authorUsecase) Delete(ctx context.Context, id int) (DeleteResp, apperr.Err) {
 	err := u.authorRepo.Delete(ctx, id)
 	if err != nil {
-		return DeleteAuthorResponse{}, err
+		return DeleteResp{}, err
 	}
 
-	return DeleteAuthorResponse{
+	return DeleteResp{
 		Success: true,
 	}, nil
 }

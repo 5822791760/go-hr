@@ -28,7 +28,7 @@ func (h AuthorHandler) Create(w http.ResponseWriter, r *http.Request) {
 		coreutil.WriteError(w, end(err))
 	}()
 
-	var body authorusecase.CreateAuthorBody
+	var body authorusecase.CreateBody
 	if err := coreutil.ParseBody(r, &body); err != nil {
 		return
 	}
@@ -91,7 +91,7 @@ func (h AuthorHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var body authorusecase.UpdateAuthorBody
+	var body authorusecase.UpdateBody
 	if err := coreutil.ParseBody(r, &body); err != nil {
 		return
 	}

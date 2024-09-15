@@ -19,7 +19,7 @@ func TestUpdate(t *testing.T) {
 	ctx := context.TODO()
 
 	id := 1
-	body := authorusecase.UpdateAuthorBody{Name: "Updated Author", Bio: "Updated Bio"}
+	body := authorusecase.UpdateBody{Name: "Updated Author", Bio: "Updated Bio"}
 	author := &repos.Author{ID: int32(id), Name: "Author 1", Bio: ""}
 
 	mockRepo.EXPECT().
@@ -34,7 +34,7 @@ func TestUpdate(t *testing.T) {
 	res, err := usecase.Update(ctx, id, body)
 
 	assert.NoError(t, err)
-	assert.Equal(t, authorusecase.UpdateAuthorResponse{
+	assert.Equal(t, authorusecase.UpdateResp{
 		ID:   id,
 		Name: "Updated Author",
 	}, res)

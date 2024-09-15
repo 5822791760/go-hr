@@ -8,27 +8,27 @@ import (
 
 // ============================== Request ==============================
 
-type CreateAuthorBody struct {
+type CreateBody struct {
 	Name string `json:"name"`
 	Bio  string `json:"bio"`
 }
 
 // ============================== Response =============================
 
-type CreateAuthorResponse struct {
+type CreateResp struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
 // ============================== Usecase ==============================
 
-func (u authorUsecase) Create(ctx context.Context, body CreateAuthorBody) (CreateAuthorResponse, apperr.Err) {
+func (u authorUsecase) Create(ctx context.Context, body CreateBody) (CreateResp, apperr.Err) {
 	author := u.authorRepo.NewAuthor(body.Name, body.Bio)
 	if err := u.authorRepo.Save(ctx, author); err != nil {
-		return CreateAuthorResponse{}, err
+		return CreateResp{}, err
 	}
 
-	return CreateAuthorResponse{
+	return CreateResp{
 		ID:   int(author.ID),
 		Name: author.Name,
 	}, nil
