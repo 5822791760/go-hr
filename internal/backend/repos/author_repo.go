@@ -9,7 +9,7 @@ import (
 	"github.com/5822791760/hr/pkg/apperr"
 	"github.com/5822791760/hr/pkg/coreutil"
 	"github.com/5822791760/hr/pkg/dbutil"
-	. "github.com/go-jet/jet/v2/postgres"
+	q "github.com/go-jet/jet/v2/postgres"
 )
 
 type Author model.Author
@@ -50,11 +50,11 @@ func (r authorRepo) FindAll(ctx context.Context) ([]Author, apperr.Err) {
 		return []Author{}, err
 	}
 
-	q := SELECT(table.Author.AllColumns).FROM(table.Author)
+	stmt := q.SELECT(table.Author.AllColumns).FROM(table.Author)
 
 	authors := []Author{}
 
-	if xerr := q.QueryContext(ctx, db, &authors); xerr != nil {
+	if xerr := stmt.QueryContext(ctx, db, &authors); xerr != nil {
 		return []Author{}, apperr.NewInternalServerErr(xerr)
 	}
 
@@ -67,11 +67,11 @@ func (r authorRepo) FindOne(ctx context.Context, id int) (*Author, apperr.Err) {
 		return &Author{}, err
 	}
 
-	q := SELECT(table.Author.AllColumns).FROM(table.Author).WHERE(table.Author.ID.EQ(Int(int64(id))))
+	stmt := q.SELECT(table.Author.AllColumns).FROM(table.Author).WHERE(table.Author.ID.EQ(q.Int(int64(id))))
 
 	var author Author
 
-	if xerr := q.QueryContext(ctx, db, &author); xerr != nil {
+	if xerr := stmt.QueryContext(ctx, db, &author); xerr != nil {
 		return &Author{}, apperr.NewAuthorNotFoundErr(xerr)
 	}
 
@@ -84,15 +84,15 @@ func (r authorRepo) NameExist(ctx context.Context, name string, id int) (bool, a
 		return false, err
 	}
 
-	cond := AND(table.Author.Name.EQ(String(name)))
+	cond := q.AND(table.Author.Name.EQ(q.String(name)))
 
 	if id != 0 {
-		cond = cond.AND(table.Author.ID.NOT_EQ(Int(int64(id))))
+		cond = cond.AND(table.Author.ID.NOT_EQ(q.Int(int64(id))))
 	}
 
-	q := dbutil.SelectExist().FROM(table.Author).WHERE(cond)
+	stmt := dbutil.SelectExist().FROM(table.Author).WHERE(cond)
 
-	exist, err := dbutil.IsExist(db, q)
+	exist, err := dbutil.IsExist(db, stmt)
 	if err != nil {
 		return false, err
 	}
@@ -127,7 +127,7 @@ func (r authorRepo) Validate(ctx context.Context, author *Author) apperr.Err {
 // =================== Write ===================
 
 func (r authorRepo) Save(ctx context.Context, author *Author) apperr.Err {
-	var s Statement
+	var stmt q.Statement
 
 	db, err := coreutil.GetDB(ctx)
 	if err != nil {
@@ -143,21 +143,21 @@ func (r authorRepo) Save(ctx context.Context, author *Author) apperr.Err {
 	if author.ID == 0 {
 		author.CreatedAt = r.clock.Now()
 
-		s = table.Author.
+		stmt = table.Author.
 			INSERT(table.Author.Name, table.Author.Bio, table.Author.CreatedAt, table.Author.UpdatedAt).
 			MODEL(author).
 			RETURNING(table.Author.AllColumns)
 
 	} else {
-		s = table.Author.
+		stmt = table.Author.
 			UPDATE(table.Author.Name, table.Author.Bio, table.Author.UpdatedAt).
 			MODEL(author).
-			WHERE(table.Author.ID.EQ(Int(int64(author.ID)))).
+			WHERE(table.Author.ID.EQ(q.Int(int64(author.ID)))).
 			RETURNING(table.Author.AllColumns)
 	}
 
-	if s != nil {
-		if xerr := s.QueryContext(ctx, db, author); xerr != nil {
+	if stmt != nil {
+		if xerr := stmt.QueryContext(ctx, db, author); xerr != nil {
 			return apperr.NewInternalServerErr(xerr)
 		}
 	}
@@ -171,9 +171,9 @@ func (r authorRepo) Delete(ctx context.Context, id int) apperr.Err {
 		return err
 	}
 
-	q := table.Author.DELETE().WHERE(table.Author.ID.EQ(Int(int64(id))))
+	stmt := table.Author.DELETE().WHERE(table.Author.ID.EQ(q.Int(int64(id))))
 
-	res, xerr := q.ExecContext(ctx, db)
+	res, xerr := stmt.ExecContext(ctx, db)
 	if xerr != nil {
 		return apperr.NewInternalServerErr(xerr)
 	}
@@ -206,13 +206,13 @@ func (r authorRepo) QueryGetAll(ctx context.Context) ([]QueryGetAllAuthor, apper
 
 	data := []QueryGetAllAuthor{}
 
-	q := SELECT(
+	stmt := q.SELECT(
 		table.Author.ID.AS("QueryGetAllAuthor.ID"),
 		table.Author.Name.AS("QueryGetAllAuthor.Name"),
 		table.Author.Bio.AS("QueryGetAllAuthor.Bio"),
 	).FROM(table.Author)
 
-	if xerr := q.QueryContext(ctx, db, &data); xerr != nil {
+	if xerr := stmt.QueryContext(ctx, db, &data); xerr != nil {
 		return []QueryGetAllAuthor{}, apperr.NewInternalServerErr(xerr)
 	}
 
